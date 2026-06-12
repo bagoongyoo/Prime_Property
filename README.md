@@ -1,48 +1,36 @@
-# Prime Property — React + Tailwind CSS
+# Prime Property — Animated Bilingual Version
 
-## Cara menjalankan
+## Run locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Buka URL yang muncul dari Vite, biasanya:
-
-```bash
-http://localhost:5173
-```
-
-## Route tersedia
+## Routes
 
 - `/` — Landing Page
-- `/about` — Tentang Kami
-- `/contact` — Kontak
-- `/agent/login` — Login Agent
+- `/about` — About Us
+- `/contact` — Contact
+- `/agent/login` — Agent Login
+- `/agent/dashboard` — Internal Dashboard
 
-## Demo login
+## Demo accounts
 
 Superadmin:
 - Email: `superadmin@primeproperty.id`
 - Password: `Prime12345!`
 
-Admin readonly:
+Admin read-only:
 - Email: `agent@primeproperty.id`
 - Password: `Prime12345!`
 
-Setelah login berhasil, user diarahkan ke `/agent/dashboard`. Pada mode superadmin tersedia fitur simulasi backend: tambah, edit, detail, dan soft delete properti menggunakan localStorage.
+## What's new
 
-## Catatan production
-
-Frontend ini sudah siap untuk integrasi backend, tetapi session `httpOnly cookie`, bcrypt, CSRF, rate limit final, dan authorization role tetap wajib di-handle dari backend.
-
-
-## Deploy Vercel
-
-Pastikan setting Vercel seperti ini:
-
-- Framework Preset: Vite
-- Build Command: `npm run build`
-- Output Directory: `dist`
-
-File `vercel.json` sudah disiapkan untuk SPA fallback agar `/about`, `/contact`, dan `/agent/login` tidak blank/404 saat di-refresh.
+- Reactive animated background that follows the pointer.
+- English and Indonesian language toggle.
+- English is the default language.
+- Agent Login is hidden from the public navbar and remains accessible through `/agent/login`.
+- Superadmin mock dashboard with localStorage-based CRUD simulation.
+- Animated drawer opening and closing.
+- Vercel SPA fallback is included in `vercel.json`.

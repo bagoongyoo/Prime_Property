@@ -1,13 +1,392 @@
 import { useEffect, useMemo, useState } from "react";
 
-const SHOW_AGENT_LOGIN_IN_PUBLIC_NAV = false;
+const DEFAULT_LANG = "en";
 
 const CONTACT_INFO = {
   phone: "+62 812-3456-7890",
   whatsapp: "https://wa.me/6281234567890",
   email: "info@primeproperty.id",
-  address: "Jl. Krakatau No. 88, Medan, Sumatera Utara",
+  address: "Jl. Krakatau No. 88, Medan, North Sumatra",
 };
+
+const COPY = {
+  en: {
+    brandSub: "Premium Real Estate · Medan",
+    navHome: "Home",
+    navAbout: "About Us",
+    navContact: "Contact",
+    loginAgent: "Agent Login",
+    backHome: "Back to Home",
+    language: "Language",
+    heroEyebrow: "Medan · North Sumatra · Indonesia",
+    heroTitleA: "Premium Properties",
+    heroTitleB: "Curated for",
+    heroTitleC: "Your Next Move",
+    heroDesc:
+      "Discover selected shophouses and villas in strategic areas of Medan. Every listing is verified, clearly priced, and supported by a professional team.",
+    viewProperties: "View Properties",
+    contactUs: "Contact Us",
+    statsUnits: "Available Units",
+    statsAreas: "Prime Areas",
+    statsExperience: "Experience",
+    featuredEyebrow: "Curated Inventory",
+    featuredTitle: "Featured Properties",
+    selectedUnits: "selected units",
+    tablePhoto: "Photo",
+    tableProperty: "Property",
+    tableSize: "Size",
+    tableType: "Type",
+    tableFloors: "Floors",
+    tableArea: "Area",
+    tablePriceStatus: "Price & Status",
+    clickDetail: "Click to view details",
+    noGroup: "No group",
+    whyEyebrow: "Our Advantages",
+    whyTitle: "Why Prime Property",
+    why: [
+      {
+        iconKey: "verified",
+        title: "Verified Portfolio",
+        desc: "Every unit goes through a careful document verification process before it is published on our platform.",
+      },
+      {
+        iconKey: "price",
+        title: "Transparent Pricing",
+        desc: "Prices are presented clearly and simply, so buyers can understand every offer with confidence.",
+      },
+      {
+        iconKey: "location",
+        title: "Strategic Locations",
+        desc: "Our listings are located across premium areas in Medan, including Krakatau, Helvetia, Cemara Asri, and Pancing.",
+      },
+      {
+        iconKey: "team",
+        title: "Professional Team",
+        desc: "Experienced agents guide each property search with clarity, speed, and objective recommendations.",
+      },
+    ],
+    aboutEyebrow: "About Prime Property",
+    aboutTitle: "Helping you choose property with clear, reliable data.",
+    aboutDesc:
+      "Prime Property is a premium real estate platform for Medan and surrounding areas, focused on curated listings, transparent pricing, and professional support.",
+    aboutProfileEyebrow: "Company Profile",
+    aboutHeading: "A trusted platform for curated premium properties.",
+    aboutP1:
+      "We help buyers and investors discover selected shophouses, villas, and residential properties through concise, accurate, and comparable listing data. Core details such as size, area, unit status, carport availability, and price are displayed clearly.",
+    aboutP2:
+      "Our approach is simple: present the data that matters, curate relevant units, and keep communication professional from the first search to the site visit.",
+    vision: "Vision",
+    visionText: "To become the most trusted premium real estate platform for Medan and North Sumatra.",
+    mission: "Mission",
+    missionText: "To provide verified, transparent, and accessible property information for every potential buyer.",
+    quote:
+      "A good property is not only about location. It is also about clear data and a safe process.",
+    quoteDesc:
+      "Our values are transparency, accuracy, fast response, and professional communication with buyers and property owners.",
+    contactEyebrow: "Contact Prime Property",
+    contactTitle: "Discuss your property needs with our team.",
+    contactDesc: "Send us a message through the form or contact us directly by phone, email, and WhatsApp.",
+    contactInfo: "Contact Information",
+    contactHeading: "Reach our office.",
+    address: "Address",
+    phone: "Phone",
+    email: "Email",
+    whatsapp: "WhatsApp",
+    chatWhatsapp: "Chat via WhatsApp",
+    mapsPlaceholder: "A Google Maps embed can be placed here once the office coordinates are available.",
+    contactForm: "Contact Form",
+    sendMessage: "Send a Message",
+    name: "Name",
+    mobileNumber: "Mobile Number",
+    message: "Message",
+    send: "Send Message",
+    sending: "Sending...",
+    requiredName: "Name is required.",
+    requiredEmail: "Email is required.",
+    invalidEmail: "Please enter a valid email address.",
+    requiredPhone: "Mobile number is required.",
+    invalidPhone: "Mobile number must contain at least 10 digits.",
+    requiredMessage: "Message is required.",
+    rateLimit: "The submission limit has been reached. Please try again later.",
+    sentSuccess: "Your message has been sent. Our team will contact you soon.",
+    success: "Success",
+    warning: "Attention",
+    footerDesc:
+      "A premium property platform for Medan and surrounding areas. Verified listings, concise data, and transparent pricing.",
+    footerContact: "Contact",
+    footerNav: "Navigation",
+    copyright: "© 2026 Prime Property. All rights reserved.",
+    premiumMedan: "Premium Real Estate Medan",
+    detailTitle: "Property Details",
+    dashboardProperty: "Property Dashboard",
+    price: "Price",
+    propertyName: "Property Name",
+    group: "Group",
+    size: "Size",
+    facing: "Facing",
+    unit: "Unit",
+    floorCount: "Floors",
+    carport: "Carport",
+    status: "Status",
+    condition: "Condition",
+    area: "Area",
+    updated: "Last Updated",
+    summary: "Summary",
+    maps: "Open in Google Maps",
+    editProperty: "Edit Property",
+    deleteProperty: "Delete / Archive",
+    summaryText: ({ name, tipe, kawasan, lebar, panjang, hadap, tingkat, carport }) =>
+      `${name} is a ${tipe.toLowerCase()} in ${kawasan}, measuring ${lebar} × ${panjang} meters, facing ${hadap}, with ${tingkat} floor(s), and ${carport ? "including" : "without"} a carport.`,
+    loginEyebrow: "Internal Portal",
+    loginTitle: "Sign in to Dashboard",
+    loginDesc: "Internal access for Prime Property administrators and superadmins. Self-registration is not available.",
+    password: "Password",
+    signIn: "Sign In",
+    verifying: "Verifying...",
+    locked: "Locked",
+    secureSession: "Secure Connection · Session via httpOnly Cookie",
+    superadminDemo: "Superadmin: superadmin@primeproperty.id / Prime12345!",
+    adminDemo: "Admin: agent@primeproperty.id / Prime12345!",
+    emailRequired: "Email is required.",
+    passwordRequired: "Password is required.",
+    invalidLogin: "Invalid email or password.",
+    lockMessage: "This account has been temporarily locked for 15 minutes after 5 failed login attempts within 30 minutes.",
+    dashboardEyebrow: "Internal Agent Portal",
+    dashboardTitle: (role) => `${role === "superadmin" ? "Superadmin" : "Admin"} Dashboard`,
+    dashboardDesc:
+      "This is a front-end mock backend powered by localStorage. In production, all CRUD actions, authorization, audit logs, and sessions must be handled by a secure backend API.",
+    addProperty: "Add Property",
+    activeListings: "Active Listings",
+    inStock: "In Stock",
+    soldOut: "Sold Out",
+    archived: "Archived",
+    managementTitle: "Property Listing Management",
+    managementDescSuper: "Click a row to view details. Superadmins can create, update, and soft-delete listings.",
+    managementDescAdmin: "Click a row to view details. Admins can only view and search listings.",
+    searchPlaceholder: "Search name, group, area...",
+    actions: "Actions",
+    edit: "Edit",
+    delete: "Delete",
+    view: "View",
+    emptySearch: "No property matches your search.",
+    seeWebsite: "View Website",
+    logout: "Logout",
+    backendNote:
+      "Agent Login is intentionally hidden from the public navbar. Internal users should access it directly through /agent/login.",
+    superadminForm: "Superadmin Form",
+    addPropertyTitle: "Add Property",
+    editPropertyTitle: "Edit Property",
+    width: "Width (m)",
+    length: "Length (m)",
+    imageUrl: "Image URL",
+    mapsLink: "Google Maps Link",
+    saveChanges: "Save Changes",
+    createProperty: "Add Property",
+    cancel: "Cancel",
+    hasCarport: "Has carport",
+    nameMin: "Property name must be at least 3 characters.",
+    nameMax: "Property name must be no more than 100 characters.",
+    widthInvalid: "Width must be greater than 0.",
+    lengthInvalid: "Length must be greater than 0.",
+    floorsInvalid: "Floors must be between 1 and 10.",
+    priceInvalid: "Price is required and must be greater than 0.",
+    areaRequired: "Area is required.",
+    mapsInvalid: "The maps link must use a Google Maps URL.",
+    propertyCreated: "The property has been added successfully.",
+    propertyUpdated: "Property changes have been saved successfully.",
+    propertyArchived: "The property has been moved to the archive.",
+    confirmDelete: (name) => `Are you sure you want to delete ${name}? This action will move the listing to the archive.`,
+  },
+  id: {
+    brandSub: "Premium Real Estate · Medan",
+    navHome: "Beranda",
+    navAbout: "Tentang Kami",
+    navContact: "Kontak",
+    loginAgent: "Login Agent",
+    backHome: "Kembali ke Beranda",
+    language: "Bahasa",
+    heroEyebrow: "Medan · Sumatera Utara · Indonesia",
+    heroTitleA: "Properti Premium",
+    heroTitleB: "Pilihan Terbaik",
+    heroTitleC: "untuk Anda",
+    heroDesc:
+      "Temukan ruko dan villa terbaik di kawasan strategis Medan. Setiap unit terverifikasi, harga transparan, dan proses dibantu oleh tim profesional.",
+    viewProperties: "Lihat Properti",
+    contactUs: "Hubungi Kami",
+    statsUnits: "Unit Tersedia",
+    statsAreas: "Kawasan Premium",
+    statsExperience: "Pengalaman",
+    featuredEyebrow: "Inventori Pilihan",
+    featuredTitle: "Properti Unggulan",
+    selectedUnits: "unit terpilih",
+    tablePhoto: "Foto",
+    tableProperty: "Properti",
+    tableSize: "Ukuran",
+    tableType: "Tipe",
+    tableFloors: "Lantai",
+    tableArea: "Kawasan",
+    tablePriceStatus: "Harga & Status",
+    clickDetail: "Klik untuk lihat detail",
+    noGroup: "Tanpa group",
+    whyEyebrow: "Keunggulan Kami",
+    whyTitle: "Mengapa Prime Property",
+    why: [
+      {
+        iconKey: "verified",
+        title: "Portofolio Terverifikasi",
+        desc: "Setiap unit melewati proses verifikasi dokumen menyeluruh sebelum dipublikasikan ke platform kami.",
+      },
+      {
+        iconKey: "price",
+        title: "Harga Transparan",
+        desc: "Harga ditampilkan secara jelas dan sederhana agar calon pembeli memahami setiap penawaran dengan percaya diri.",
+      },
+      {
+        iconKey: "location",
+        title: "Lokasi Strategis",
+        desc: "Listing kami tersebar di kawasan premium Medan, termasuk Krakatau, Helvetia, Cemara Asri, dan Pancing.",
+      },
+      {
+        iconKey: "team",
+        title: "Tim Profesional",
+        desc: "Agen berpengalaman mendampingi proses pencarian properti dengan jelas, cepat, dan objektif.",
+      },
+    ],
+    aboutEyebrow: "Tentang Prime Property",
+    aboutTitle: "Membantu Anda memilih properti dengan data yang jelas.",
+    aboutDesc:
+      "Prime Property adalah platform properti premium untuk kawasan Medan dan sekitarnya, dengan fokus pada kurasi unit, transparansi harga, dan pendampingan profesional.",
+    aboutProfileEyebrow: "Profil Perusahaan",
+    aboutHeading: "Platform kurasi properti premium berbasis kepercayaan.",
+    aboutP1:
+      "Kami membantu calon pembeli dan investor menemukan ruko, villa, dan hunian pilihan melalui data listing yang ringkas, akurat, dan mudah dibandingkan. Informasi inti seperti ukuran, kawasan, status unit, carport, dan harga ditampilkan secara jelas.",
+    aboutP2:
+      "Pendekatan kami sederhana: tampilkan data yang penting, kurasi unit yang relevan, dan jaga komunikasi tetap profesional dari awal pencarian hingga kunjungan lokasi.",
+    vision: "Visi",
+    visionText: "Menjadi platform properti premium paling dipercaya untuk pasar Medan dan Sumatera Utara.",
+    mission: "Misi",
+    missionText: "Menyediakan informasi properti yang terverifikasi, transparan, dan mudah diakses oleh calon pembeli.",
+    quote:
+      "Properti yang baik bukan hanya soal lokasi, tetapi juga kejelasan data dan proses yang aman.",
+    quoteDesc:
+      "Nilai kami adalah transparansi, ketelitian, respons cepat, dan komunikasi profesional dengan pembeli maupun pemilik listing.",
+    contactEyebrow: "Kontak Prime Property",
+    contactTitle: "Diskusikan kebutuhan properti Anda dengan tim kami.",
+    contactDesc: "Kirim pesan melalui form atau hubungi kami langsung lewat telepon, email, dan WhatsApp.",
+    contactInfo: "Informasi Kontak",
+    contactHeading: "Hubungi kantor kami.",
+    address: "Alamat",
+    phone: "Telepon",
+    email: "Email",
+    whatsapp: "WhatsApp",
+    chatWhatsapp: "Chat via WhatsApp",
+    mapsPlaceholder: "Area Google Maps dapat dipasang di sini jika koordinat kantor sudah tersedia.",
+    contactForm: "Form Kontak",
+    sendMessage: "Kirim Pesan",
+    name: "Nama",
+    mobileNumber: "Nomor HP",
+    message: "Pesan",
+    send: "Kirim Pesan",
+    sending: "Mengirim...",
+    requiredName: "Nama wajib diisi.",
+    requiredEmail: "Email wajib diisi.",
+    invalidEmail: "Gunakan format email yang valid.",
+    requiredPhone: "Nomor HP wajib diisi.",
+    invalidPhone: "Nomor HP minimal 10 digit.",
+    requiredMessage: "Pesan wajib diisi.",
+    rateLimit: "Batas submit tercapai. Coba lagi beberapa saat nanti.",
+    sentSuccess: "Pesan terkirim, tim kami akan menghubungi Anda.",
+    success: "Berhasil",
+    warning: "Perhatian",
+    footerDesc:
+      "Platform properti premium untuk kawasan Medan dan sekitarnya. Listing terverifikasi, data ringkas, harga transparan.",
+    footerContact: "Kontak",
+    footerNav: "Navigasi",
+    copyright: "© 2026 Prime Property. Seluruh hak cipta dilindungi.",
+    premiumMedan: "Premium Real Estate Medan",
+    detailTitle: "Detail Properti",
+    dashboardProperty: "Dashboard Properti",
+    price: "Harga",
+    propertyName: "Nama Properti",
+    group: "Group",
+    size: "Ukuran",
+    facing: "Hadap",
+    unit: "Unit",
+    floorCount: "Lantai",
+    carport: "Carport",
+    status: "Status",
+    condition: "Kondisi",
+    area: "Kawasan",
+    updated: "Update Terakhir",
+    summary: "Ringkasan",
+    maps: "Buka di Google Maps",
+    editProperty: "Edit Properti",
+    deleteProperty: "Hapus / Arsipkan",
+    summaryText: ({ name, tipe, kawasan, lebar, panjang, hadap, tingkat, carport }) =>
+      `${name} adalah ${tipe.toLowerCase()} di kawasan ${kawasan} dengan ukuran ${lebar} × ${panjang} meter, hadap ${hadap}, terdiri dari ${tingkat} lantai, dan ${carport ? "sudah memiliki" : "belum memiliki"} carport.`,
+    loginEyebrow: "Portal Internal",
+    loginTitle: "Masuk ke Dashboard",
+    loginDesc: "Akses internal untuk admin dan superadmin Prime Property. Tidak ada self-registration.",
+    password: "Password",
+    signIn: "Masuk",
+    verifying: "Memverifikasi...",
+    locked: "Terkunci",
+    secureSession: "Koneksi Aman · Session via httpOnly Cookie",
+    superadminDemo: "Superadmin: superadmin@primeproperty.id / Prime12345!",
+    adminDemo: "Admin: agent@primeproperty.id / Prime12345!",
+    emailRequired: "Email wajib diisi.",
+    passwordRequired: "Password wajib diisi.",
+    invalidLogin: "Email atau password tidak valid.",
+    lockMessage: "Akun dikunci sementara selama 15 menit karena 5x gagal login dalam 30 menit.",
+    dashboardEyebrow: "Internal Agent Portal",
+    dashboardTitle: (role) => `Dashboard ${role === "superadmin" ? "Superadmin" : "Admin"}`,
+    dashboardDesc:
+      "Ini adalah simulasi backend di frontend menggunakan localStorage. Di production, seluruh CRUD, authorization, audit log, dan session wajib dipindahkan ke backend API.",
+    addProperty: "Tambah Properti",
+    activeListings: "Listing Aktif",
+    inStock: "In Stock",
+    soldOut: "Sold Out",
+    archived: "Arsip",
+    managementTitle: "Manajemen Listing Properti",
+    managementDescSuper: "Klik baris untuk melihat detail. Superadmin dapat membuat, mengubah, dan melakukan soft delete listing.",
+    managementDescAdmin: "Klik baris untuk melihat detail. Admin hanya dapat melihat dan mencari listing.",
+    searchPlaceholder: "Cari nama, group, kawasan...",
+    actions: "Aksi",
+    edit: "Edit",
+    delete: "Hapus",
+    view: "View",
+    emptySearch: "Tidak ada properti yang cocok dengan pencarian.",
+    seeWebsite: "Lihat Website",
+    logout: "Logout",
+    backendNote:
+      "Login Agent sengaja disembunyikan dari navbar publik. User internal mengaksesnya langsung melalui /agent/login.",
+    superadminForm: "Form Superadmin",
+    addPropertyTitle: "Tambah Properti",
+    editPropertyTitle: "Edit Properti",
+    width: "Lebar (m)",
+    length: "Panjang (m)",
+    imageUrl: "Image URL",
+    mapsLink: "Google Maps Link",
+    saveChanges: "Simpan Perubahan",
+    createProperty: "Tambah Properti",
+    cancel: "Batal",
+    hasCarport: "Ada carport",
+    nameMin: "Nama properti minimal 3 karakter.",
+    nameMax: "Nama properti maksimal 100 karakter.",
+    widthInvalid: "Lebar harus lebih dari 0.",
+    lengthInvalid: "Panjang harus lebih dari 0.",
+    floorsInvalid: "Lantai harus 1 sampai 10.",
+    priceInvalid: "Harga wajib diisi dan harus lebih dari 0.",
+    areaRequired: "Kawasan wajib diisi.",
+    mapsInvalid: "Link maps harus menggunakan URL Google Maps.",
+    propertyCreated: "Properti berhasil ditambahkan.",
+    propertyUpdated: "Perubahan properti berhasil disimpan.",
+    propertyArchived: "Properti dipindahkan ke arsip.",
+    confirmDelete: (name) => `Yakin hapus properti ${name}? Listing akan dipindahkan ke arsip.`,
+  },
+};
+
+const CONTACT_ADDRESS_ID = "Jl. Krakatau No. 88, Medan, Sumatera Utara";
 
 const PROPERTIES = [
   {
@@ -114,29 +493,6 @@ const PROPERTIES = [
   },
 ];
 
-const WHY = [
-  {
-    iconKey: "verified",
-    title: "Portofolio Terverifikasi",
-    desc: "Setiap unit melewati proses verifikasi dokumen menyeluruh sebelum dipublikasikan ke platform kami.",
-  },
-  {
-    iconKey: "price",
-    title: "Harga Transparan",
-    desc: "Harga yang tercantum jelas, ringkas, dan mudah dipahami oleh calon pembeli.",
-  },
-  {
-    iconKey: "location",
-    title: "Lokasi Strategis",
-    desc: "Tersebar di kawasan premium Medan — Krakatau, Helvetia, Cemara Asri, Pancing, dan sekitarnya.",
-  },
-  {
-    iconKey: "team",
-    title: "Tim Profesional",
-    desc: "Agen berpengalaman mendampingi proses pencarian properti secara rapi dan objektif.",
-  },
-];
-
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -168,7 +524,7 @@ function safeSetJSON(key, value) {
     if (typeof window === "undefined" || !window.localStorage) return;
     window.localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    // Preview extension bisa membatasi storage.
+    // Some preview environments restrict storage.
   }
 }
 
@@ -181,8 +537,9 @@ function safeRemove(key) {
   }
 }
 
-const AUTH_KEY = "prime_property_auth_session_v1";
-const PROPERTY_STORE_KEY = "prime_property_mock_backend_v1";
+const AUTH_KEY = "prime_property_auth_session_v2";
+const PROPERTY_STORE_KEY = "prime_property_mock_backend_v2";
+const LANG_KEY = "prime_property_lang_v1";
 
 function loadAuthSession() {
   const session = safeGetJSON(AUTH_KEY, null);
@@ -238,7 +595,7 @@ function safeOpenExternal(url) {
     const w = window.open(url, "_blank", "noopener,noreferrer");
     if (!w) window.location.href = url;
   } catch {
-    alert(`Silakan buka tautan ini secara manual:\n${url}`);
+    alert(`Please open this link manually:\n${url}`);
   }
 }
 
@@ -285,9 +642,8 @@ function useClientRouter() {
     try {
       const isWeb = window.location.protocol === "http:" || window.location.protocol === "https:";
       if (isWeb) window.history.pushState({}, "", path);
-      // Di JSX Opener / chrome-extension / blob / file, biarkan React state saja.
     } catch {
-      // Abaikan manipulasi URL agar tidak muncul error Uncaught di preview extension.
+      // Keep navigation state-based in restricted preview environments.
     }
 
     try {
@@ -298,6 +654,69 @@ function useClientRouter() {
   };
 
   return { page, navigate };
+}
+
+function useReactivePointer() {
+  const [point, setPoint] = useState({ x: 50, y: 50 });
+
+  useEffect(() => {
+    const move = (event) => {
+      const x = (event.clientX / Math.max(window.innerWidth, 1)) * 100;
+      const y = (event.clientY / Math.max(window.innerHeight, 1)) * 100;
+      setPoint({ x, y });
+    };
+
+    window.addEventListener("pointermove", move, { passive: true });
+    return () => window.removeEventListener("pointermove", move);
+  }, []);
+
+  return point;
+}
+
+function ReactiveBackground({ variant = "dark" }) {
+  const { x, y } = useReactivePointer();
+  const isDark = variant === "dark";
+
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div
+        className={cn(
+          "absolute inset-0 transition-[background] duration-300",
+          isDark ? "opacity-100" : "opacity-70"
+        )}
+        style={{
+          background: `radial-gradient(circle at ${x}% ${y}%, rgba(201,169,97,0.20), transparent 22rem)`,
+        }}
+      />
+      <div
+        className={cn(
+          "absolute inset-0 animate-grid-move",
+          isDark ? "opacity-[0.06]" : "opacity-[0.05]"
+        )}
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(201,169,97,0.55) 1px, transparent 1px), linear-gradient(90deg, rgba(201,169,97,0.55) 1px, transparent 1px)",
+          backgroundSize: "80px 80px",
+          maskImage: "radial-gradient(circle at center, black, transparent 78%)",
+          WebkitMaskImage: "radial-gradient(circle at center, black, transparent 78%)",
+        }}
+      />
+      <div className="absolute right-[8%] top-[14%] h-72 w-72 animate-float-slow rounded-full bg-prime-gold/10 blur-3xl" />
+      <div className="absolute bottom-[12%] left-[6%] h-56 w-56 animate-drift rounded-full bg-prime-gold/5 blur-3xl" />
+      {[...Array(7)].map((_, i) => (
+        <span
+          key={i}
+          className="absolute h-1.5 w-1.5 rotate-45 bg-prime-gold/30"
+          style={{
+            left: `${12 + i * 13}%`,
+            top: `${18 + ((i * 17) % 60)}%`,
+            animation: `drift ${6 + i * 0.8}s ease-in-out infinite`,
+            animationDelay: `${i * 0.35}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
 }
 
 function Svg({ children, size = 20, strokeWidth = 1.8, className = "" }) {
@@ -404,7 +823,41 @@ function WhyIcon({ kind }) {
     team: <SparklesIcon />,
   };
 
-  return <div className="soft-icon h-10 w-10 transition duration-300 group-hover:-translate-y-1 group-hover:scale-105">{map[kind] || <SparklesIcon />}</div>;
+  return (
+    <div className="soft-icon h-10 w-10 transition duration-300 group-hover:-translate-y-1 group-hover:scale-105">
+      {map[kind] || <SparklesIcon />}
+    </div>
+  );
+}
+
+function LangToggle({ lang, setLang, dark = true }) {
+  const set = (next) => {
+    setLang(next);
+    safeSetJSON(LANG_KEY, next);
+    document.documentElement.lang = next === "en" ? "en" : "id";
+  };
+
+  return (
+    <div className={cn("inline-flex rounded-2xl p-1", dark ? "bg-white/5" : "bg-prime-black/5")}>
+      {["en", "id"].map((item) => (
+        <button
+          key={item}
+          type="button"
+          onClick={() => set(item)}
+          className={cn(
+            "rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] transition duration-300",
+            lang === item
+              ? "bg-prime-gold text-prime-black shadow-gold"
+              : dark
+                ? "text-white/45 hover:text-white"
+                : "text-prime-black/45 hover:text-prime-black"
+          )}
+        >
+          {item}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 function SectionEyebrow({ children, light = false }) {
@@ -416,7 +869,7 @@ function SectionEyebrow({ children, light = false }) {
   );
 }
 
-function Wordmark({ light = true, onClick }) {
+function Wordmark({ light = true, onClick, t }) {
   return (
     <button
       type="button"
@@ -430,7 +883,7 @@ function Wordmark({ light = true, onClick }) {
           Prime Property
         </span>
         <span className="mt-1 block text-[8px] font-semibold uppercase tracking-[0.22em] text-prime-gold">
-          Premium Real Estate · Medan
+          {t.brandSub}
         </span>
       </span>
     </button>
@@ -455,7 +908,7 @@ function StatusTag({ status, siap }) {
   const label = {
     siap_huni: "Siap Huni",
     siap_kosong: "Siap Kosong",
-    siap_huni_renovasi: "Renovasi",
+    siap_huni_renovasi: "Renovation",
   }[siap] || "Siap Huni";
 
   return (
@@ -498,26 +951,7 @@ function PrimaryCTA({ children, onClick, type = "button", disabled = false, icon
   );
 }
 
-function LoginAgentButton({ onClick, mobile = false }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "group inline-flex items-center justify-center gap-3 rounded-2xl px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-prime-gold transition duration-300",
-        "border-0 outline-none hover:-translate-y-0.5 hover:bg-white/[0.06] active:translate-y-0",
-        mobile && "w-full bg-prime-gold/10 py-3"
-      )}
-    >
-      <span className="grid h-9 w-9 place-items-center rounded-xl bg-prime-gold/10 text-prime-gold transition duration-300 group-hover:scale-105 group-hover:bg-prime-gold/15">
-        <UserArrowIcon />
-      </span>
-      <span>Login Agent</span>
-    </button>
-  );
-}
-
-function Header({ currentPage, navigate }) {
+function Header({ currentPage, navigate, lang, setLang, t }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -534,9 +968,9 @@ function Header({ currentPage, navigate }) {
   };
 
   const navItems = [
-    ["landing", "Beranda"],
-    ["about", "Tentang Kami"],
-    ["contact", "Kontak"],
+    ["landing", t.navHome],
+    ["about", t.navAbout],
+    ["contact", t.navContact],
   ];
 
   return (
@@ -547,7 +981,7 @@ function Header({ currentPage, navigate }) {
       )}
     >
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between">
-        <Wordmark light onClick={() => go("landing")} />
+        <Wordmark light onClick={() => go("landing")} t={t} />
 
         <nav className="hidden items-center gap-8 md:flex">
           {navItems.map(([id, label]) => (
@@ -564,12 +998,12 @@ function Header({ currentPage, navigate }) {
             </button>
           ))}
 
-          {SHOW_AGENT_LOGIN_IN_PUBLIC_NAV && <LoginAgentButton onClick={() => go("login")} />}
+          <LangToggle lang={lang} setLang={setLang} />
         </nav>
 
         <button
           type="button"
-          aria-label="Buka menu"
+          aria-label="Open menu"
           onClick={() => setMenuOpen((v) => !v)}
           className="grid h-10 w-10 place-items-center rounded-xl border border-prime-gold/25 text-prime-gold md:hidden"
         >
@@ -598,11 +1032,9 @@ function Header({ currentPage, navigate }) {
               </button>
             ))}
 
-            {SHOW_AGENT_LOGIN_IN_PUBLIC_NAV && (
-              <div className="pt-4">
-                <LoginAgentButton onClick={() => go("login")} mobile />
-              </div>
-            )}
+            <div className="pt-4">
+              <LangToggle lang={lang} setLang={setLang} />
+            </div>
           </div>
         </div>
       )}
@@ -610,39 +1042,29 @@ function Header({ currentPage, navigate }) {
   );
 }
 
-function Hero({ navigate }) {
+function Hero({ navigate, t }) {
   return (
     <section className="relative flex min-h-screen items-center overflow-hidden bg-prime-black py-28">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute right-0 top-0 h-full w-1/2 bg-[linear-gradient(125deg,transparent_55%,rgba(201,169,97,0.035)_100%)]" />
-        <div className="absolute left-6 top-[22%] h-[56%] w-px bg-gradient-to-b from-transparent via-prime-gold/25 to-transparent sm:left-20" />
-        <div className="absolute left-[45%] top-1/4 h-px w-[55%] bg-gradient-to-r from-transparent via-prime-gold/10 to-transparent" />
-        <div className="absolute left-[45%] top-3/4 h-px w-[55%] bg-gradient-to-r from-transparent via-prime-gold/10 to-transparent" />
-        <div className="absolute right-[12%] top-[18%] h-56 w-56 animate-float-slow rounded-full bg-prime-gold/5 blur-3xl" />
-      </div>
-
+      <ReactiveBackground />
       <div className="container-prime relative">
         <div className="max-w-3xl animate-fade-up">
-          <SectionEyebrow light>Medan · Sumatera Utara · Indonesia</SectionEyebrow>
+          <SectionEyebrow light>{t.heroEyebrow}</SectionEyebrow>
 
           <h1 className="max-w-3xl text-4xl font-black leading-[1.03] tracking-[-0.045em] text-white sm:text-6xl lg:text-[76px]">
-            Properti Premium
+            {t.heroTitleA}
             <br />
-            <span className="text-prime-gold">Pilihan Terbaik</span>
+            <span className="text-prime-gold">{t.heroTitleB}</span>
             <br />
-            untuk Anda
+            {t.heroTitleC}
           </h1>
 
-          <p className="mt-6 max-w-lg text-sm leading-8 text-white/55 sm:text-base">
-            Temukan ruko dan villa terbaik di kawasan strategis Medan. Setiap unit terverifikasi,
-            harga transparan, dan proses dibantu oleh tim profesional.
-          </p>
+          <p className="mt-6 max-w-lg text-sm leading-8 text-white/55 sm:text-base">{t.heroDesc}</p>
 
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <PrimaryCTA
               onClick={() => document.getElementById("featured")?.scrollIntoView({ behavior: "smooth" })}
             >
-              Lihat Properti
+              {t.viewProperties}
             </PrimaryCTA>
 
             <button
@@ -650,7 +1072,7 @@ function Hero({ navigate }) {
               onClick={() => navigate("contact")}
               className="group inline-flex items-center gap-2 rounded-2xl px-2 py-3 text-sm font-semibold text-white/55 transition duration-300 hover:text-white"
             >
-              Hubungi Kami
+              {t.contactUs}
               <span className="text-prime-gold transition duration-300 group-hover:translate-x-1">
                 <ArrowRightIcon />
               </span>
@@ -659,9 +1081,9 @@ function Hero({ navigate }) {
 
           <div className="mt-16 flex flex-wrap gap-9 border-t border-prime-gold/15 pt-7 sm:gap-14">
             {[
-              { n: "200+", l: "Unit Tersedia" },
-              { n: "15+", l: "Kawasan Premium" },
-              { n: "10 Thn", l: "Pengalaman" },
+              { n: "200+", l: t.statsUnits },
+              { n: "15+", l: t.statsAreas },
+              { n: "10 Yrs", l: t.statsExperience },
             ].map((s) => (
               <div key={s.l} className="animate-fade-up">
                 <div className="text-3xl font-black leading-none tracking-[-0.04em] text-white sm:text-4xl">
@@ -679,7 +1101,7 @@ function Hero({ navigate }) {
   );
 }
 
-function PropertyRow({ prop, onSelect }) {
+function PropertyRow({ prop, onSelect, t }) {
   return (
     <article
       role="button"
@@ -698,16 +1120,16 @@ function PropertyRow({ prop, onSelect }) {
       <div className="grid gap-4 px-0 py-5 sm:px-4 lg:grid-cols-[88px_minmax(0,1fr)_118px_70px_54px_112px_172px] lg:items-center">
         <img
           src={prop.image}
-          alt={`Foto ${prop.name}`}
+          alt={prop.name}
           loading="lazy"
           className="h-48 w-full rounded-2xl object-cover shadow-sm transition duration-500 group-hover:scale-[1.01] group-hover:saturate-110 sm:h-56 lg:h-16 lg:w-[88px] lg:rounded-xl"
         />
 
         <div className="min-w-0">
           <h3 className="truncate text-sm font-extrabold tracking-[-0.01em] text-prime-black">{prop.name}</h3>
-          <p className="mt-1 text-xs text-prime-black/45">{prop.group || "Tanpa group"}</p>
+          <p className="mt-1 text-xs text-prime-black/45">{prop.group || t.noGroup}</p>
           <p className="mt-2 text-[10px] font-extrabold uppercase tracking-[0.12em] text-prime-gold">
-            Klik untuk lihat detail
+            {t.clickDetail}
           </p>
         </div>
 
@@ -719,7 +1141,7 @@ function PropertyRow({ prop, onSelect }) {
           <TypeBadge type={prop.tipe} />
         </div>
 
-        <div className="hidden text-xs text-prime-black/45 lg:block">{prop.tingkat} lt</div>
+        <div className="hidden text-xs text-prime-black/45 lg:block">{prop.tingkat}</div>
         <div className="hidden text-xs text-prime-black/45 lg:block">{prop.kawasan}</div>
 
         <div className="flex flex-wrap items-center gap-2 lg:flex-col lg:items-end">
@@ -757,6 +1179,7 @@ function PropertyDetailDrawer({
   onEdit,
   onDelete,
   context = "public",
+  t,
 }) {
   const [renderedProperty, setRenderedProperty] = useState(property);
   const [closing, setClosing] = useState(false);
@@ -797,10 +1220,10 @@ function PropertyDetailDrawer({
   if (!renderedProperty) return null;
 
   const siapLabel = {
-    siap_huni: "Siap Huni",
-    siap_kosong: "Siap Kosong",
-    siap_huni_renovasi: "Siap Huni Renovasi",
-  }[renderedProperty.siap] || "Siap Huni";
+    siap_huni: t.lang === "id" ? "Siap Huni" : "Ready to Occupy",
+    siap_kosong: t.lang === "id" ? "Siap Kosong" : "Vacant",
+    siap_huni_renovasi: t.lang === "id" ? "Siap Huni Renovasi" : "Ready After Renovation",
+  }[renderedProperty.siap] || "Ready to Occupy";
 
   return (
     <>
@@ -823,7 +1246,7 @@ function PropertyDetailDrawer({
         <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-prime-black/10 bg-white/95 p-5 backdrop-blur-xl">
           <div>
             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-prime-gold">
-              {context === "dashboard" ? "Dashboard Properti" : "Detail Properti"}
+              {context === "dashboard" ? t.dashboardProperty : t.detailTitle}
             </p>
             <h2 className="mt-1 text-xl font-black tracking-[-0.03em] text-prime-black">{renderedProperty.name}</h2>
           </div>
@@ -832,14 +1255,14 @@ function PropertyDetailDrawer({
             type="button"
             onClick={onClose}
             className="grid h-10 w-10 place-items-center rounded-2xl bg-prime-soft text-prime-black transition duration-300 hover:rotate-90 hover:bg-prime-red/10 hover:text-prime-red"
-            aria-label="Tutup detail"
+            aria-label="Close details"
           >
             <XIcon />
           </button>
         </div>
 
         <div className="relative">
-          <img src={renderedProperty.image} alt={`Foto ${renderedProperty.name}`} className="h-64 w-full object-cover" />
+          <img src={renderedProperty.image} alt={renderedProperty.name} className="h-64 w-full object-cover" />
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-prime-black/55 to-transparent p-5">
             <div className="flex flex-wrap gap-2">
               <TypeBadge type={renderedProperty.tipe} />
@@ -850,7 +1273,7 @@ function PropertyDetailDrawer({
 
         <div className="space-y-6 p-5">
           <section className="animate-fade-up rounded-3xl bg-prime-soft p-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-prime-black/40">Harga</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-prime-black/40">{t.price}</p>
             <p className="mt-1 text-3xl font-black tracking-[-0.05em] text-prime-black">{fmtRp(renderedProperty.price)}</p>
             <p className="mt-2 text-sm leading-6 text-prime-black/55">
               {renderedProperty.group ? `${renderedProperty.group} · ` : ""}{renderedProperty.kawasan}
@@ -864,43 +1287,41 @@ function PropertyDetailDrawer({
                 onClick={() => onEdit?.(renderedProperty)}
                 className="inline-flex items-center justify-center rounded-2xl bg-prime-black px-5 py-3 text-[10px] font-black uppercase tracking-[0.16em] text-prime-gold transition duration-300 hover:-translate-y-0.5"
               >
-                Edit Properti
+                {t.editProperty}
               </button>
               <button
                 type="button"
                 onClick={() => onDelete?.(renderedProperty)}
                 className="inline-flex items-center justify-center rounded-2xl bg-prime-red/10 px-5 py-3 text-[10px] font-black uppercase tracking-[0.16em] text-prime-red transition duration-300 hover:-translate-y-0.5 hover:bg-prime-red/15"
               >
-                Hapus / Arsipkan
+                {t.deleteProperty}
               </button>
             </section>
           )}
 
           <section className="animate-fade-up grid gap-x-5 md:grid-cols-2">
             <div>
-              <DetailRow label="Nama Properti" value={renderedProperty.name} />
-              <DetailRow label="Group" value={renderedProperty.group || "-"} />
-              <DetailRow label="Ukuran" value={`${renderedProperty.lebar} × ${renderedProperty.panjang} meter`} />
-              <DetailRow label="Hadap" value={renderedProperty.hadap} />
-              <DetailRow label="Tipe" value={renderedProperty.tipe} />
-              <DetailRow label="Unit" value={renderedProperty.unit || "-"} />
+              <DetailRow label={t.propertyName} value={renderedProperty.name} />
+              <DetailRow label={t.group} value={renderedProperty.group || "-"} />
+              <DetailRow label={t.size} value={`${renderedProperty.lebar} × ${renderedProperty.panjang} m`} />
+              <DetailRow label={t.facing} value={renderedProperty.hadap} />
+              <DetailRow label={t.tableType} value={renderedProperty.tipe} />
+              <DetailRow label={t.unit} value={renderedProperty.unit || "-"} />
             </div>
             <div>
-              <DetailRow label="Tingkat" value={`${renderedProperty.tingkat} lantai`} />
-              <DetailRow label="Carport" value={renderedProperty.carport ? "Ya" : "Tidak"} />
-              <DetailRow label="Status" value={renderedProperty.status === "sold_out" ? "Sold Out" : "In Stock"} />
-              <DetailRow label="Kondisi" value={siapLabel} />
-              <DetailRow label="Kawasan" value={renderedProperty.kawasan} />
-              <DetailRow label="Update Terakhir" value={renderedProperty.updated_at || "-"} />
+              <DetailRow label={t.floorCount} value={renderedProperty.tingkat} />
+              <DetailRow label={t.carport} value={renderedProperty.carport ? "Yes" : "No"} />
+              <DetailRow label={t.status} value={renderedProperty.status === "sold_out" ? "Sold Out" : "In Stock"} />
+              <DetailRow label={t.condition} value={siapLabel} />
+              <DetailRow label={t.area} value={renderedProperty.kawasan} />
+              <DetailRow label={t.updated} value={renderedProperty.updated_at || "-"} />
             </div>
           </section>
 
           <section className="animate-fade-up rounded-3xl border border-prime-gold/20 bg-prime-gold/5 p-5">
-            <h3 className="text-sm font-black text-prime-black">Ringkasan</h3>
+            <h3 className="text-sm font-black text-prime-black">{t.summary}</h3>
             <p className="mt-2 text-sm leading-7 text-prime-black/60">
-              {renderedProperty.name} adalah {renderedProperty.tipe.toLowerCase()} di kawasan {renderedProperty.kawasan} dengan
-              ukuran {renderedProperty.lebar} × {renderedProperty.panjang} meter, hadap {renderedProperty.hadap}, terdiri dari{" "}
-              {renderedProperty.tingkat} lantai, dan {renderedProperty.carport ? "sudah memiliki" : "belum memiliki"} carport.
+              {t.summaryText(renderedProperty)}
             </p>
           </section>
 
@@ -911,7 +1332,7 @@ function PropertyDetailDrawer({
               className="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-prime-black px-5 py-4 text-xs font-black uppercase tracking-[0.16em] text-prime-gold transition duration-300 hover:-translate-y-0.5 hover:bg-black"
             >
               <PinIcon />
-              Buka di Google Maps
+              {t.maps}
             </button>
           )}
         </div>
@@ -920,23 +1341,24 @@ function PropertyDetailDrawer({
   );
 }
 
-function FeaturedSection() {
+function FeaturedSection({ t }) {
   const [selected, setSelected] = useState(null);
 
   return (
     <>
-      <section id="featured" className="bg-white py-16 sm:py-24">
-        <div className="container-prime">
+      <section id="featured" className="relative overflow-hidden bg-white py-16 sm:py-24">
+        <ReactiveBackground variant="light" />
+        <div className="container-prime relative">
           <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <SectionEyebrow>Inventori Pilihan</SectionEyebrow>
-              <h2 className="text-3xl font-black tracking-[-0.04em] text-prime-black sm:text-4xl">Properti Unggulan</h2>
+              <SectionEyebrow>{t.featuredEyebrow}</SectionEyebrow>
+              <h2 className="text-3xl font-black tracking-[-0.04em] text-prime-black sm:text-4xl">{t.featuredTitle}</h2>
             </div>
-            <span className="text-xs font-semibold tracking-wide text-prime-black/45">{PROPERTIES.length} unit terpilih</span>
+            <span className="text-xs font-semibold tracking-wide text-prime-black/45">{PROPERTIES.length} {t.selectedUnits}</span>
           </div>
 
           <div className="hidden border-b border-prime-black/5 px-4 pb-3 lg:grid lg:grid-cols-[88px_minmax(0,1fr)_118px_70px_54px_112px_172px] lg:gap-4">
-            {["Foto", "Properti", "Ukuran", "Tipe", "Lantai", "Kawasan", "Harga & Status"].map((h, i) => (
+            {[t.tablePhoto, t.tableProperty, t.tableSize, t.tableType, t.tableFloors, t.tableArea, t.tablePriceStatus].map((h, i) => (
               <div
                 key={h}
                 className={cn(
@@ -951,35 +1373,35 @@ function FeaturedSection() {
 
           <div className="border-t border-prime-black/5 lg:border-t-0">
             {PROPERTIES.map((p) => (
-              <PropertyRow key={p.id} prop={p} onSelect={setSelected} />
+              <PropertyRow key={p.id} prop={p} onSelect={setSelected} t={t} />
             ))}
           </div>
         </div>
       </section>
 
-      <PropertyDetailDrawer property={selected} onClose={() => setSelected(null)} />
+      <PropertyDetailDrawer property={selected} onClose={() => setSelected(null)} t={t} />
     </>
   );
 }
 
-function WhySection() {
+function WhySection({ t }) {
   return (
     <section className="bg-prime-soft py-16 sm:py-24">
       <div className="container-prime">
         <div className="mb-14">
-          <SectionEyebrow>Keunggulan Kami</SectionEyebrow>
-          <h2 className="text-3xl font-black tracking-[-0.04em] text-prime-black sm:text-4xl">Mengapa Prime Property</h2>
+          <SectionEyebrow>{t.whyEyebrow}</SectionEyebrow>
+          <h2 className="text-3xl font-black tracking-[-0.04em] text-prime-black sm:text-4xl">{t.whyTitle}</h2>
         </div>
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-0">
-          {WHY.map((item, i) => (
+          {t.why.map((item, i) => (
             <div
               key={item.title}
               className={cn(
                 "group animate-fade-up border-prime-black/10 lg:px-7",
                 i > 0 && "lg:border-l",
                 i === 0 && "lg:pl-0",
-                i === WHY.length - 1 && "lg:pr-0"
+                i === t.why.length - 1 && "lg:pr-0"
               )}
             >
               <WhyIcon kind={item.iconKey} />
@@ -996,7 +1418,7 @@ function WhySection() {
 function PageHero({ eyebrow, title, desc }) {
   return (
     <section className="relative overflow-hidden bg-prime-black pt-32 pb-16 sm:pt-40 sm:pb-20">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_20%,rgba(201,169,97,0.10),transparent_32%)]" />
+      <ReactiveBackground />
       <div className="container-prime relative animate-fade-up">
         <SectionEyebrow light>{eyebrow}</SectionEyebrow>
         <h1 className="max-w-3xl text-4xl font-black leading-tight tracking-[-0.045em] text-white sm:text-6xl">
@@ -1017,56 +1439,43 @@ function InfoBlock({ title, text }) {
   );
 }
 
-function AboutPage({ navigate, currentPage }) {
+function AboutPage({ navigate, currentPage, lang, setLang, t }) {
   return (
     <>
-      <Header currentPage={currentPage} navigate={navigate} />
-      <PageHero
-        eyebrow="Tentang Prime Property"
-        title="Membantu Anda memilih properti dengan data yang jelas."
-        desc="Prime Property adalah platform properti premium untuk kawasan Medan dan sekitarnya, dengan fokus pada kurasi unit, transparansi harga, dan pendampingan profesional."
-      />
+      <Header currentPage={currentPage} navigate={navigate} lang={lang} setLang={setLang} t={t} />
+      <PageHero eyebrow={t.aboutEyebrow} title={t.aboutTitle} desc={t.aboutDesc} />
 
-      <main className="bg-white py-16 sm:py-24">
-        <div className="container-prime grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+      <main className="relative overflow-hidden bg-white py-16 sm:py-24">
+        <ReactiveBackground variant="light" />
+        <div className="container-prime relative grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
           <section className="animate-fade-up">
-            <SectionEyebrow>Profil Perusahaan</SectionEyebrow>
+            <SectionEyebrow>{t.aboutProfileEyebrow}</SectionEyebrow>
             <h2 className="text-3xl font-black tracking-[-0.04em] text-prime-black sm:text-4xl">
-              Platform kurasi properti premium berbasis kepercayaan.
+              {t.aboutHeading}
             </h2>
-            <p className="mt-5 text-sm leading-8 text-prime-black/60">
-              Kami membantu calon pembeli dan investor menemukan ruko, villa, dan hunian pilihan melalui data
-              listing yang ringkas, akurat, dan mudah dibandingkan. Setiap informasi inti seperti ukuran,
-              kawasan, status unit, carport, dan harga ditampilkan secara jelas.
-            </p>
-            <p className="mt-4 text-sm leading-8 text-prime-black/60">
-              Pendekatan kami sederhana: tampilkan data yang penting, kurasi unit yang relevan, dan jaga proses
-              komunikasi tetap profesional dari awal pencarian sampai tahap kunjungan lokasi.
-            </p>
+            <p className="mt-5 text-sm leading-8 text-prime-black/60">{t.aboutP1}</p>
+            <p className="mt-4 text-sm leading-8 text-prime-black/60">{t.aboutP2}</p>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
-              <InfoBlock title="Visi" text="Menjadi platform properti premium paling dipercaya untuk pasar Medan dan Sumatera Utara." />
-              <InfoBlock title="Misi" text="Menyediakan informasi listing yang terverifikasi, transparan, dan mudah diakses oleh calon pembeli." />
+              <InfoBlock title={t.vision} text={t.visionText} />
+              <InfoBlock title={t.mission} text={t.missionText} />
             </div>
           </section>
 
           <aside className="relative min-h-[420px] overflow-hidden rounded-[2rem] bg-prime-black p-8 text-white shadow-soft sm:p-10">
-            <div className="absolute -right-20 -top-20 h-64 w-64 rotate-45 border border-prime-gold/20" />
+            <ReactiveBackground />
             <div className="relative animate-fade-up">
               <div className="mb-8 text-7xl leading-none text-prime-gold">“</div>
               <blockquote className="text-3xl font-black leading-tight tracking-[-0.04em]">
-                Properti yang baik bukan hanya soal lokasi, tetapi juga kejelasan data dan proses yang aman.
+                {t.quote}
               </blockquote>
-              <p className="mt-6 text-sm leading-8 text-white/35">
-                Nilai kami: transparansi, ketelitian, respons cepat, dan komunikasi yang rapi dengan calon pembeli
-                maupun pemilik listing.
-              </p>
+              <p className="mt-6 text-sm leading-8 text-white/35">{t.quoteDesc}</p>
             </div>
           </aside>
         </div>
       </main>
 
-      <Footer navigate={navigate} />
+      <Footer navigate={navigate} t={t} />
     </>
   );
 }
@@ -1099,16 +1508,16 @@ function PublicInput({ label, value, onChange, error, textarea = false }) {
     <div className="mb-5">
       <label className="field-label">{label}</label>
       {textarea ? (
-        <textarea className={cn("field-input min-h-32 resize-y", error && "border-prime-red")} value={value} onChange={onChange} />
+        <textarea className={cn("field-input min-h-32 resize-y rounded-2xl", error && "border-prime-red")} value={value} onChange={onChange} />
       ) : (
-        <input className={cn("field-input", error && "border-prime-red")} value={value} onChange={onChange} />
+        <input className={cn("field-input rounded-2xl", error && "border-prime-red")} value={value} onChange={onChange} />
       )}
       {error && <FieldError>{error}</FieldError>}
     </div>
   );
 }
 
-function ContactForm({ onSuccess }) {
+function ContactForm({ onSuccess, t }) {
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -1120,12 +1529,12 @@ function ContactForm({ onSuccess }) {
 
   const validate = () => {
     const next = {};
-    if (!form.name.trim()) next.name = "Nama wajib diisi.";
-    if (!form.email.trim()) next.email = "Email wajib diisi.";
-    else if (!validateEmail(form.email)) next.email = "Format email tidak valid.";
-    if (!form.phone.trim()) next.phone = "Nomor HP wajib diisi.";
-    else if (onlyDigits(form.phone).length < 10) next.phone = "Nomor HP minimal 10 digit.";
-    if (!form.message.trim()) next.message = "Pesan wajib diisi.";
+    if (!form.name.trim()) next.name = t.requiredName;
+    if (!form.email.trim()) next.email = t.requiredEmail;
+    else if (!validateEmail(form.email)) next.email = t.invalidEmail;
+    if (!form.phone.trim()) next.phone = t.requiredPhone;
+    else if (onlyDigits(form.phone).length < 10) next.phone = t.invalidPhone;
+    if (!form.message.trim()) next.message = t.requiredMessage;
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -1134,7 +1543,7 @@ function ContactForm({ onSuccess }) {
     const key = "prime_contact_submit_log";
     const now = Date.now();
     const oneHour = 60 * 60 * 1000;
-    const log = safeGetJSON(key, []).filter((t) => now - t < oneHour);
+    const log = safeGetJSON(key, []).filter((time) => now - time < oneHour);
     if (log.length >= 3) return false;
     safeSetJSON(key, [...log, now]);
     return true;
@@ -1145,7 +1554,7 @@ function ContactForm({ onSuccess }) {
     if (!validate()) return;
 
     if (!checkContactRateLimit()) {
-      setErrors({ message: "Batas submit tercapai. Coba lagi beberapa saat nanti." });
+      setErrors({ message: t.rateLimit });
       return;
     }
 
@@ -1153,29 +1562,29 @@ function ContactForm({ onSuccess }) {
     await new Promise((resolve) => setTimeout(resolve, 650));
     setSubmitting(false);
     setForm({ name: "", email: "", phone: "", message: "" });
-    onSuccess("Pesan terkirim, tim kami akan menghubungi Anda.");
+    onSuccess(t.sentSuccess);
   };
 
   return (
     <form onSubmit={submit} className="animate-fade-up rounded-[2rem] border border-prime-black/5 bg-prime-soft p-6 sm:p-8">
-      <SectionEyebrow>Form Kontak</SectionEyebrow>
-      <h2 className="mb-6 text-3xl font-black tracking-[-0.04em] text-prime-black">Kirim pesan</h2>
+      <SectionEyebrow>{t.contactForm}</SectionEyebrow>
+      <h2 className="mb-6 text-3xl font-black tracking-[-0.04em] text-prime-black">{t.sendMessage}</h2>
 
-      <PublicInput label="Nama" value={form.name} onChange={set("name")} error={errors.name} />
-      <PublicInput label="Email" value={form.email} onChange={set("email")} error={errors.email} />
-      <PublicInput label="Nomor HP" value={form.phone} onChange={set("phone")} error={errors.phone} />
-      <PublicInput label="Pesan" value={form.message} onChange={set("message")} error={errors.message} textarea />
+      <PublicInput label={t.name} value={form.name} onChange={set("name")} error={errors.name} />
+      <PublicInput label={t.email} value={form.email} onChange={set("email")} error={errors.email} />
+      <PublicInput label={t.mobileNumber} value={form.phone} onChange={set("phone")} error={errors.phone} />
+      <PublicInput label={t.message} value={form.message} onChange={set("message")} error={errors.message} textarea />
 
-      {errors.message && errors.message.includes("Batas") && <FieldError>{errors.message}</FieldError>}
+      {errors.message && errors.message === t.rateLimit && <FieldError>{errors.message}</FieldError>}
 
       <PrimaryCTA type="submit" disabled={submitting} icon={<ArrowRightIcon />}>
-        {submitting ? "Mengirim..." : "Kirim Pesan"}
+        {submitting ? t.sending : t.send}
       </PrimaryCTA>
     </form>
   );
 }
 
-function Toast({ message, type = "success", onClose }) {
+function Toast({ message, type = "success", onClose, t }) {
   useEffect(() => {
     if (!message) return undefined;
     const timer = setTimeout(onClose, 3200);
@@ -1186,35 +1595,33 @@ function Toast({ message, type = "success", onClose }) {
 
   return (
     <div className={cn("fixed bottom-6 right-6 z-[90] max-w-sm animate-fade-up rounded-2xl border p-4 text-sm leading-6 shadow-soft", type === "error" ? "border-white/20 bg-prime-red text-white" : "border-prime-gold/30 bg-prime-black text-white")}>
-      <b className={type === "error" ? "text-white" : "text-prime-gold"}>{type === "error" ? "Perhatian" : "Berhasil"}</b>
+      <b className={type === "error" ? "text-white" : "text-prime-gold"}>{type === "error" ? t.warning : t.success}</b>
       <p>{message}</p>
     </div>
   );
 }
 
-function ContactPage({ navigate, currentPage }) {
+function ContactPage({ navigate, currentPage, lang, setLang, t }) {
   const [toast, setToast] = useState(null);
+  const address = lang === "id" ? CONTACT_ADDRESS_ID : CONTACT_INFO.address;
 
   return (
     <>
-      <Header currentPage={currentPage} navigate={navigate} />
-      <PageHero
-        eyebrow="Kontak Prime Property"
-        title="Diskusikan kebutuhan properti Anda dengan tim kami."
-        desc="Kirim pesan melalui form atau hubungi kami langsung lewat telepon, email, dan WhatsApp."
-      />
+      <Header currentPage={currentPage} navigate={navigate} lang={lang} setLang={setLang} t={t} />
+      <PageHero eyebrow={t.contactEyebrow} title={t.contactTitle} desc={t.contactDesc} />
 
-      <main className="bg-white py-16 sm:py-24">
-        <div className="container-prime grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
+      <main className="relative overflow-hidden bg-white py-16 sm:py-24">
+        <ReactiveBackground variant="light" />
+        <div className="container-prime relative grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
           <section className="animate-fade-up">
-            <SectionEyebrow>Informasi Kontak</SectionEyebrow>
-            <h2 className="text-3xl font-black tracking-[-0.04em] text-prime-black sm:text-4xl">Hubungi kantor kami.</h2>
+            <SectionEyebrow>{t.contactInfo}</SectionEyebrow>
+            <h2 className="text-3xl font-black tracking-[-0.04em] text-prime-black sm:text-4xl">{t.contactHeading}</h2>
 
             <div className="mt-6">
-              <ContactCard label="Alamat" value={CONTACT_INFO.address} />
-              <ContactCard label="Telepon" value={CONTACT_INFO.phone} />
-              <ContactCard label="Email" value={CONTACT_INFO.email} />
-              <ContactCard label="WhatsApp" value="Chat via WhatsApp" href={CONTACT_INFO.whatsapp} />
+              <ContactCard label={t.address} value={address} />
+              <ContactCard label={t.phone} value={CONTACT_INFO.phone} />
+              <ContactCard label={t.email} value={CONTACT_INFO.email} />
+              <ContactCard label={t.whatsapp} value={t.chatWhatsapp} href={CONTACT_INFO.whatsapp} />
             </div>
 
             <div className="mt-6 grid min-h-56 place-items-center rounded-[2rem] border border-prime-black/5 bg-prime-soft p-8 text-center">
@@ -1222,41 +1629,38 @@ function ContactPage({ navigate, currentPage }) {
                 <div className="mx-auto mb-4 w-fit">
                   <WhyIcon kind="location" />
                 </div>
-                <p className="text-sm leading-7 text-prime-black/45">
-                  Area Google Maps dapat dipasang di sini jika koordinat kantor sudah tersedia.
-                </p>
+                <p className="text-sm leading-7 text-prime-black/45">{t.mapsPlaceholder}</p>
               </div>
             </div>
           </section>
 
-          <ContactForm onSuccess={(msg) => setToast(msg)} />
+          <ContactForm onSuccess={(msg) => setToast(msg)} t={t} />
         </div>
       </main>
 
-      <Footer navigate={navigate} />
-      <Toast message={toast} onClose={() => setToast(null)} />
+      <Footer navigate={navigate} t={t} />
+      <Toast message={toast} onClose={() => setToast(null)} t={t} />
     </>
   );
 }
 
-function Footer({ navigate }) {
+function Footer({ navigate, t }) {
   return (
-    <footer className="bg-prime-black py-12 text-white sm:py-16">
-      <div className="container-prime">
+    <footer className="relative overflow-hidden bg-prime-black py-12 text-white sm:py-16">
+      <ReactiveBackground />
+      <div className="container-prime relative">
         <div className="flex flex-wrap justify-between gap-10">
           <div className="max-w-xs">
-            <Wordmark light onClick={() => navigate("landing")} />
-            <p className="mt-5 text-sm leading-7 text-white/25">
-              Platform properti premium untuk kawasan Medan dan sekitarnya. Verifikasi ketat, data ringkas, harga transparan.
-            </p>
+            <Wordmark light onClick={() => navigate("landing")} t={t} />
+            <p className="mt-5 text-sm leading-7 text-white/25">{t.footerDesc}</p>
           </div>
 
           <div>
-            <p className="mb-4 text-[8px] font-black uppercase tracking-[0.22em] text-prime-gold">Kontak</p>
+            <p className="mb-4 text-[8px] font-black uppercase tracking-[0.22em] text-prime-gold">{t.footerContact}</p>
             {[
-              ["Telepon", CONTACT_INFO.phone],
-              ["WhatsApp", "wa.me/6281234567890"],
-              ["Email", CONTACT_INFO.email],
+              [t.phone, CONTACT_INFO.phone],
+              [t.whatsapp, "wa.me/6281234567890"],
+              [t.email, CONTACT_INFO.email],
             ].map(([k, v]) => (
               <p key={k} className="mb-2 text-xs text-white/45">
                 <span className="text-white/25">{k}: </span>
@@ -1266,11 +1670,11 @@ function Footer({ navigate }) {
           </div>
 
           <div>
-            <p className="mb-4 text-[8px] font-black uppercase tracking-[0.22em] text-prime-gold">Navigasi</p>
+            <p className="mb-4 text-[8px] font-black uppercase tracking-[0.22em] text-prime-gold">{t.footerNav}</p>
             {[
-              ["landing", "Beranda"],
-              ["about", "Tentang Kami"],
-              ["contact", "Kontak"],
+              ["landing", t.navHome],
+              ["about", t.navAbout],
+              ["contact", t.navContact],
             ].map(([id, label]) => (
               <button
                 key={id}
@@ -1285,17 +1689,16 @@ function Footer({ navigate }) {
         </div>
 
         <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-prime-gold/10 pt-6">
-          <p className="text-xs text-white/20">© 2026 Prime Property. Seluruh hak cipta dilindungi.</p>
+          <p className="text-xs text-white/20">{t.copyright}</p>
           <p className="flex items-center gap-2 text-[8px] font-bold uppercase tracking-[0.18em] text-white/20">
             <span className="h-1 w-1 rotate-45 bg-prime-gold/50" />
-            Premium Real Estate Medan
+            {t.premiumMedan}
           </p>
         </div>
       </div>
     </footer>
   );
 }
-
 
 function DashboardStat({ label, value, tone = "gold" }) {
   return (
@@ -1308,12 +1711,13 @@ function DashboardStat({ label, value, tone = "gold" }) {
   );
 }
 
-function DashboardHeader({ auth, onLogout, navigate }) {
+function DashboardHeader({ auth, onLogout, navigate, lang, setLang, t }) {
   return (
     <header className="sticky top-0 z-50 border-b border-prime-gold/15 bg-prime-black/95 px-6 py-4 backdrop-blur-xl sm:px-8">
       <div className="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-4">
-        <Wordmark light onClick={() => navigate("dashboard")} />
+        <Wordmark light onClick={() => navigate("dashboard")} t={t} />
         <div className="flex items-center gap-3">
+          <LangToggle lang={lang} setLang={setLang} />
           <div className="hidden text-right sm:block">
             <p className="text-xs font-black text-white">{auth.name}</p>
             <p className="text-[9px] font-black uppercase tracking-[0.16em] text-prime-gold">{auth.role}</p>
@@ -1323,14 +1727,14 @@ function DashboardHeader({ auth, onLogout, navigate }) {
             onClick={() => navigate("landing")}
             className="rounded-2xl px-4 py-3 text-[10px] font-black uppercase tracking-[0.16em] text-white/45 transition hover:bg-white/5 hover:text-white"
           >
-            Lihat Website
+            {t.seeWebsite}
           </button>
           <button
             type="button"
             onClick={onLogout}
             className="rounded-2xl bg-prime-red/10 px-4 py-3 text-[10px] font-black uppercase tracking-[0.16em] text-prime-red transition hover:bg-prime-red/15"
           >
-            Logout
+            {t.logout}
           </button>
         </div>
       </div>
@@ -1373,24 +1777,24 @@ function propertyToForm(p) {
   };
 }
 
-function validatePropertyForm(form) {
+function validatePropertyForm(form, t) {
   const errors = {};
-  if (!form.name.trim()) errors.name = "Nama properti wajib diisi.";
-  else if (form.name.trim().length < 3) errors.name = "Nama minimal 3 karakter.";
-  else if (form.name.trim().length > 100) errors.name = "Nama maksimal 100 karakter.";
+  if (!form.name.trim()) errors.name = t.requiredName;
+  else if (form.name.trim().length < 3) errors.name = t.nameMin;
+  else if (form.name.trim().length > 100) errors.name = t.nameMax;
 
   const lebar = Number(form.lebar);
   const panjang = Number(form.panjang);
   const tingkat = Number(form.tingkat);
   const price = Number(String(form.price).replace(/\D/g, ""));
 
-  if (!lebar || lebar <= 0) errors.lebar = "Lebar harus lebih dari 0.";
-  if (!panjang || panjang <= 0) errors.panjang = "Panjang harus lebih dari 0.";
-  if (!tingkat || tingkat < 1 || tingkat > 10) errors.tingkat = "Tingkat harus 1 sampai 10.";
-  if (!price || price <= 0) errors.price = "Harga wajib diisi dan harus lebih dari 0.";
-  if (!form.kawasan.trim()) errors.kawasan = "Kawasan wajib diisi.";
+  if (!lebar || lebar <= 0) errors.lebar = t.widthInvalid;
+  if (!panjang || panjang <= 0) errors.panjang = t.lengthInvalid;
+  if (!tingkat || tingkat < 1 || tingkat > 10) errors.tingkat = t.floorsInvalid;
+  if (!price || price <= 0) errors.price = t.priceInvalid;
+  if (!form.kawasan.trim()) errors.kawasan = t.areaRequired;
   if (form.maps_link && !form.maps_link.includes("google.com/maps") && !form.maps_link.includes("google.com/search")) {
-    errors.maps_link = "Link maps harus mengandung domain google.com/maps atau Google Maps search.";
+    errors.maps_link = t.mapsInvalid;
   }
 
   return errors;
@@ -1406,7 +1810,7 @@ function DashInput({ label, error, children }) {
   );
 }
 
-function PropertyEditorDrawer({ open, property, onClose, onSubmit }) {
+function PropertyEditorDrawer({ open, property, onClose, onSubmit, t }) {
   const [renderOpen, setRenderOpen] = useState(open);
   const [closing, setClosing] = useState(false);
   const [form, setForm] = useState(emptyPropertyForm());
@@ -1448,7 +1852,7 @@ function PropertyEditorDrawer({ open, property, onClose, onSubmit }) {
 
   const submit = (e) => {
     e.preventDefault();
-    const nextErrors = validatePropertyForm(form);
+    const nextErrors = validatePropertyForm(form, t);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
 
@@ -1484,9 +1888,9 @@ function PropertyEditorDrawer({ open, property, onClose, onSubmit }) {
       <aside className={cn("fixed bottom-0 right-0 top-0 z-[81] w-full max-w-[640px] overflow-y-auto bg-white shadow-soft", closing ? "animate-slide-out-right" : "animate-slide-in-right")}>
         <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-prime-black/10 bg-white/95 p-5 backdrop-blur-xl">
           <div>
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-prime-gold">Superadmin Form</p>
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-prime-gold">{t.superadminForm}</p>
             <h2 className="mt-1 text-xl font-black tracking-[-0.03em] text-prime-black">
-              {property ? "Edit Properti" : "Tambah Properti"}
+              {property ? t.editPropertyTitle : t.addPropertyTitle}
             </h2>
           </div>
           <button type="button" onClick={onClose} className="grid h-10 w-10 place-items-center rounded-2xl bg-prime-soft text-prime-black transition hover:rotate-90 hover:text-prime-red">
@@ -1495,51 +1899,51 @@ function PropertyEditorDrawer({ open, property, onClose, onSubmit }) {
         </div>
 
         <form onSubmit={submit} className="grid gap-5 p-5 sm:grid-cols-2">
-          <DashInput label="Nama Properti" error={errors.name}>
+          <DashInput label={t.propertyName} error={errors.name}>
             <input className={cn(inputClass, errors.name && "border-prime-red")} value={form.name} onChange={set("name")} />
           </DashInput>
 
-          <DashInput label="Group" error={errors.group}>
-            <input className={inputClass} value={form.group} onChange={set("group")} placeholder="Opsional" />
+          <DashInput label={t.group} error={errors.group}>
+            <input className={inputClass} value={form.group} onChange={set("group")} placeholder="Optional" />
           </DashInput>
 
-          <DashInput label="Lebar (m)" error={errors.lebar}>
+          <DashInput label={t.width} error={errors.lebar}>
             <input className={cn(inputClass, errors.lebar && "border-prime-red")} value={form.lebar} onChange={set("lebar")} inputMode="decimal" />
           </DashInput>
 
-          <DashInput label="Panjang (m)" error={errors.panjang}>
+          <DashInput label={t.length} error={errors.panjang}>
             <input className={cn(inputClass, errors.panjang && "border-prime-red")} value={form.panjang} onChange={set("panjang")} inputMode="decimal" />
           </DashInput>
 
-          <DashInput label="Hadap" error={errors.hadap}>
+          <DashInput label={t.facing} error={errors.hadap}>
             <select className={inputClass} value={form.hadap} onChange={set("hadap")}>
               {["Utara", "Selatan", "Timur", "Barat"].map((v) => <option key={v}>{v}</option>)}
             </select>
           </DashInput>
 
-          <DashInput label="Tipe" error={errors.tipe}>
+          <DashInput label={t.tableType} error={errors.tipe}>
             <select className={inputClass} value={form.tipe} onChange={set("tipe")}>
               <option>Ruko</option>
               <option>Villa</option>
             </select>
           </DashInput>
 
-          <DashInput label="Tingkat" error={errors.tingkat}>
+          <DashInput label={t.floorCount} error={errors.tingkat}>
             <input className={cn(inputClass, errors.tingkat && "border-prime-red")} value={form.tingkat} onChange={set("tingkat")} inputMode="decimal" />
           </DashInput>
 
-          <DashInput label="Harga" error={errors.price}>
+          <DashInput label={t.price} error={errors.price}>
             <input className={cn(inputClass, errors.price && "border-prime-red")} value={form.price} onChange={set("price")} inputMode="numeric" />
           </DashInput>
 
-          <DashInput label="Status" error={errors.status}>
+          <DashInput label={t.status} error={errors.status}>
             <select className={inputClass} value={form.status} onChange={set("status")}>
               <option value="in_stock">In Stock</option>
               <option value="sold_out">Sold Out</option>
             </select>
           </DashInput>
 
-          <DashInput label="Kondisi" error={errors.siap}>
+          <DashInput label={t.condition} error={errors.siap}>
             <select className={inputClass} value={form.siap} onChange={set("siap")}>
               <option value="siap_huni">Siap Huni</option>
               <option value="siap_kosong">Siap Kosong</option>
@@ -1547,33 +1951,33 @@ function PropertyEditorDrawer({ open, property, onClose, onSubmit }) {
             </select>
           </DashInput>
 
-          <DashInput label="Kawasan" error={errors.kawasan}>
+          <DashInput label={t.area} error={errors.kawasan}>
             <input className={cn(inputClass, errors.kawasan && "border-prime-red")} value={form.kawasan} onChange={set("kawasan")} />
           </DashInput>
 
-          <DashInput label="Unit" error={errors.unit}>
+          <DashInput label={t.unit} error={errors.unit}>
             <input className={inputClass} value={form.unit} onChange={set("unit")} placeholder="Ready Siap Huni" />
           </DashInput>
 
           <label className="flex items-center gap-3 rounded-2xl bg-prime-soft p-4 text-sm font-bold text-prime-black">
             <input type="checkbox" checked={form.carport} onChange={set("carport")} />
-            Ada carport
+            {t.hasCarport}
           </label>
 
-          <DashInput label="Image URL" error={errors.image}>
+          <DashInput label={t.imageUrl} error={errors.image}>
             <input className={inputClass} value={form.image} onChange={set("image")} />
           </DashInput>
 
-          <DashInput label="Google Maps Link" error={errors.maps_link}>
+          <DashInput label={t.mapsLink} error={errors.maps_link}>
             <input className={cn(inputClass, errors.maps_link && "border-prime-red")} value={form.maps_link} onChange={set("maps_link")} placeholder="https://www.google.com/maps/..." />
           </DashInput>
 
           <div className="sm:col-span-2 flex flex-wrap gap-3 border-t border-prime-black/10 pt-5">
             <PrimaryCTA type="submit" icon={<ArrowRightIcon />}>
-              {property ? "Simpan Perubahan" : "Tambah Properti"}
+              {property ? t.saveChanges : t.createProperty}
             </PrimaryCTA>
             <button type="button" onClick={onClose} className="rounded-2xl bg-prime-soft px-5 py-4 text-[11px] font-black uppercase tracking-[0.16em] text-prime-black/55 transition hover:bg-prime-black/10">
-              Batal
+              {t.cancel}
             </button>
           </div>
         </form>
@@ -1582,7 +1986,7 @@ function PropertyEditorDrawer({ open, property, onClose, onSubmit }) {
   );
 }
 
-function DashboardPage({ auth, onLogout, navigate }) {
+function DashboardPage({ auth, onLogout, navigate, lang, setLang, t }) {
   const [properties, setProperties] = useState(loadManagedProperties);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(null);
@@ -1616,152 +2020,149 @@ function DashboardPage({ auth, onLogout, navigate }) {
   };
 
   const saveProperty = (payload) => {
-    setProperties((items) => {
-      const exists = items.some((x) => x.id === payload.id);
-      if (exists) return items.map((x) => (x.id === payload.id ? payload : x));
-      return [payload, ...items];
-    });
+    const exists = properties.some((x) => x.id === payload.id);
+    setProperties((items) => (exists ? items.map((x) => (x.id === payload.id ? payload : x)) : [payload, ...items]));
     setEditorOpen(false);
     setEditing(null);
-    setToast(payload.created_at === payload.updated_at ? "Properti berhasil ditambahkan." : "Perubahan properti berhasil disimpan.");
+    setToast(exists ? t.propertyUpdated : t.propertyCreated);
   };
 
   const deleteProperty = (property) => {
-    const ok = window.confirm(`Yakin hapus properti ${property.name}? Tindakan ini tidak dapat dibatalkan.`);
+    const ok = window.confirm(t.confirmDelete(property.name));
     if (!ok) return;
     setSelected(null);
     setProperties((items) => items.map((x) => (x.id === property.id ? { ...x, deleted_at: formatNowWib(), updated_at: formatNowWib() } : x)));
-    setToast("Properti dipindahkan ke arsip / soft delete.");
+    setToast(t.propertyArchived);
   };
 
   return (
-    <div className="min-h-screen bg-prime-black">
-      <DashboardHeader auth={auth} onLogout={onLogout} navigate={navigate} />
+    <div className="relative min-h-screen overflow-hidden bg-prime-black">
+      <ReactiveBackground />
+      <div className="relative">
+        <DashboardHeader auth={auth} onLogout={onLogout} navigate={navigate} lang={lang} setLang={setLang} t={t} />
 
-      <main className="mx-auto max-w-[1320px] px-6 py-8 sm:px-8">
-        <section className="animate-fade-up">
-          <div className="flex flex-wrap items-end justify-between gap-5">
-            <div>
-              <SectionEyebrow light>Internal Agent Portal</SectionEyebrow>
-              <h1 className="text-4xl font-black tracking-[-0.05em] text-white sm:text-5xl">
-                Dashboard {isSuperadmin ? "Superadmin" : "Admin"}
-              </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/40">
-                Ini adalah simulasi backend di frontend menggunakan localStorage. Di production, seluruh CRUD,
-                authorization, audit log, dan session wajib dipindahkan ke backend API.
-              </p>
+        <main className="mx-auto max-w-[1320px] px-6 py-8 sm:px-8">
+          <section className="animate-fade-up">
+            <div className="flex flex-wrap items-end justify-between gap-5">
+              <div>
+                <SectionEyebrow light>{t.dashboardEyebrow}</SectionEyebrow>
+                <h1 className="text-4xl font-black tracking-[-0.05em] text-white sm:text-5xl">{t.dashboardTitle(auth.role)}</h1>
+                <p className="mt-3 max-w-2xl text-sm leading-7 text-white/40">{t.dashboardDesc}</p>
+                <p className="mt-3 max-w-2xl text-xs leading-6 text-prime-gold/70">{t.backendNote}</p>
+              </div>
+
+              {isSuperadmin && (
+                <PrimaryCTA onClick={openCreate} icon={<HomeSearchIcon />}>
+                  {t.addProperty}
+                </PrimaryCTA>
+              )}
             </div>
 
-            {isSuperadmin && (
-              <PrimaryCTA onClick={openCreate} icon={<HomeSearchIcon />}>
-                Tambah Properti
-              </PrimaryCTA>
-            )}
-          </div>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <DashboardStat label="Listing Aktif" value={activeProperties.length} />
-            <DashboardStat label="In Stock" value={activeProperties.filter((p) => p.status === "in_stock").length} />
-            <DashboardStat label="Sold Out" value={activeProperties.filter((p) => p.status === "sold_out").length} tone="red" />
-            <DashboardStat label="Arsip" value={archived.length} />
-          </div>
-        </section>
-
-        <section className="mt-8 animate-fade-up overflow-hidden rounded-[2rem] bg-white shadow-soft">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-prime-black/10 p-5">
-            <div>
-              <h2 className="text-xl font-black tracking-[-0.03em] text-prime-black">Manajemen Listing Properti</h2>
-              <p className="mt-1 text-xs text-prime-black/45">
-                Klik baris untuk detail. {isSuperadmin ? "Superadmin dapat create, update, dan soft delete." : "Admin hanya bisa view dan search."}
-              </p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <DashboardStat label={t.activeListings} value={activeProperties.length} />
+              <DashboardStat label={t.inStock} value={activeProperties.filter((p) => p.status === "in_stock").length} />
+              <DashboardStat label={t.soldOut} value={activeProperties.filter((p) => p.status === "sold_out").length} tone="red" />
+              <DashboardStat label={t.archived} value={archived.length} />
             </div>
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Cari nama, group, kawasan..."
-              className="field-input w-full rounded-2xl sm:w-80"
-            />
-          </div>
+          </section>
 
-          <div className="hidden grid-cols-[1.2fr_0.8fr_0.7fr_0.7fr_0.9fr_1fr_0.7fr] gap-4 border-b border-prime-black/5 px-5 py-3 lg:grid">
-            {["Properti", "Ukuran", "Tipe", "Harga", "Status", "Updated", "Aksi"].map((h) => (
-              <div key={h} className="text-[8px] font-black uppercase tracking-[0.2em] text-prime-black/40">{h}</div>
-            ))}
-          </div>
+          <section className="mt-8 animate-fade-up overflow-hidden rounded-[2rem] bg-white shadow-soft">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-prime-black/10 p-5">
+              <div>
+                <h2 className="text-xl font-black tracking-[-0.03em] text-prime-black">{t.managementTitle}</h2>
+                <p className="mt-1 text-xs text-prime-black/45">
+                  {isSuperadmin ? t.managementDescSuper : t.managementDescAdmin}
+                </p>
+              </div>
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t.searchPlaceholder}
+                className="field-input w-full rounded-2xl sm:w-80"
+              />
+            </div>
 
-          <div>
-            {filtered.map((p) => (
-              <article
-                key={p.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => setSelected(p)}
-                className="grid cursor-pointer gap-4 border-b border-prime-black/5 p-5 transition duration-300 hover:bg-prime-soft lg:grid-cols-[1.2fr_0.8fr_0.7fr_0.7fr_0.9fr_1fr_0.7fr] lg:items-center"
-              >
-                <div className="flex items-center gap-3">
-                  <img src={p.image} alt={p.name} className="h-14 w-16 rounded-2xl object-cover" />
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-black text-prime-black">{p.name}</p>
-                    <p className="text-xs text-prime-black/45">{p.group || "Tanpa group"} · {p.kawasan}</p>
+            <div className="hidden grid-cols-[1.2fr_0.8fr_0.7fr_0.7fr_0.9fr_1fr_0.7fr] gap-4 border-b border-prime-black/5 px-5 py-3 lg:grid">
+              {[t.tableProperty, t.tableSize, t.tableType, t.price, t.status, t.updated, t.actions].map((h) => (
+                <div key={h} className="text-[8px] font-black uppercase tracking-[0.2em] text-prime-black/40">{h}</div>
+              ))}
+            </div>
+
+            <div>
+              {filtered.map((p) => (
+                <article
+                  key={p.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSelected(p)}
+                  className="grid cursor-pointer gap-4 border-b border-prime-black/5 p-5 transition duration-300 hover:bg-prime-soft lg:grid-cols-[1.2fr_0.8fr_0.7fr_0.7fr_0.9fr_1fr_0.7fr] lg:items-center"
+                >
+                  <div className="flex items-center gap-3">
+                    <img src={p.image} alt={p.name} className="h-14 w-16 rounded-2xl object-cover" />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-black text-prime-black">{p.name}</p>
+                      <p className="text-xs text-prime-black/45">{p.group || t.noGroup} · {p.kawasan}</p>
+                    </div>
                   </div>
-                </div>
-                <p className="text-sm font-semibold text-prime-black/55">{p.lebar} × {p.panjang} m</p>
-                <TypeBadge type={p.tipe} />
-                <p className="text-sm font-black text-prime-black">{fmtRp(p.price)}</p>
-                <StatusTag status={p.status} siap={p.siap} />
-                <p className="text-xs text-prime-black/45">{p.updated_at || "-"}</p>
-                <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                  {isSuperadmin ? (
-                    <>
-                      <button type="button" onClick={() => openEdit(p)} className="rounded-xl bg-prime-gold/15 px-3 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-prime-gold">
-                        Edit
-                      </button>
-                      <button type="button" onClick={() => deleteProperty(p)} className="rounded-xl bg-prime-red/10 px-3 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-prime-red">
-                        Hapus
-                      </button>
-                    </>
-                  ) : (
-                    <span className="rounded-xl bg-prime-black/5 px-3 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-prime-black/40">
-                      View
-                    </span>
-                  )}
-                </div>
-              </article>
-            ))}
+                  <p className="text-sm font-semibold text-prime-black/55">{p.lebar} × {p.panjang} m</p>
+                  <TypeBadge type={p.tipe} />
+                  <p className="text-sm font-black text-prime-black">{fmtRp(p.price)}</p>
+                  <StatusTag status={p.status} siap={p.siap} />
+                  <p className="text-xs text-prime-black/45">{p.updated_at || "-"}</p>
+                  <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                    {isSuperadmin ? (
+                      <>
+                        <button type="button" onClick={() => openEdit(p)} className="rounded-xl bg-prime-gold/15 px-3 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-prime-gold">
+                          {t.edit}
+                        </button>
+                        <button type="button" onClick={() => deleteProperty(p)} className="rounded-xl bg-prime-red/10 px-3 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-prime-red">
+                          {t.delete}
+                        </button>
+                      </>
+                    ) : (
+                      <span className="rounded-xl bg-prime-black/5 px-3 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-prime-black/40">
+                        {t.view}
+                      </span>
+                    )}
+                  </div>
+                </article>
+              ))}
 
-            {!filtered.length && (
-              <div className="p-10 text-center text-sm text-prime-black/45">Tidak ada properti yang cocok dengan pencarian.</div>
-            )}
-          </div>
-        </section>
-      </main>
+              {!filtered.length && (
+                <div className="p-10 text-center text-sm text-prime-black/45">{t.emptySearch}</div>
+              )}
+            </div>
+          </section>
+        </main>
 
-      <PropertyDetailDrawer
-        property={selected}
-        onClose={() => setSelected(null)}
-        canManage={isSuperadmin}
-        onEdit={openEdit}
-        onDelete={deleteProperty}
-        context="dashboard"
-      />
+        <PropertyDetailDrawer
+          property={selected}
+          onClose={() => setSelected(null)}
+          canManage={isSuperadmin}
+          onEdit={openEdit}
+          onDelete={deleteProperty}
+          context="dashboard"
+          t={t}
+        />
 
-      <PropertyEditorDrawer
-        open={editorOpen}
-        property={editing}
-        onClose={() => {
-          setEditorOpen(false);
-          setEditing(null);
-        }}
-        onSubmit={saveProperty}
-      />
+        <PropertyEditorDrawer
+          open={editorOpen}
+          property={editing}
+          onClose={() => {
+            setEditorOpen(false);
+            setEditing(null);
+          }}
+          onSubmit={saveProperty}
+          t={t}
+        />
 
-      <Toast message={toast} onClose={() => setToast(null)} />
+        <Toast message={toast} onClose={() => setToast(null)} t={t} />
+      </div>
     </div>
   );
 }
 
-
-const LOGIN_LOCK_KEY = "prime_agent_login_lock_v1";
+const LOGIN_LOCK_KEY = "prime_agent_login_lock_v2";
 const LOGIN_WINDOW_MS = 30 * 60 * 1000;
 const LOGIN_LOCK_MS = 15 * 60 * 1000;
 const MAX_LOGIN_ATTEMPTS = 5;
@@ -1795,14 +2196,14 @@ function InputFieldDark({ label, type = "text", value, onChange, error, placehol
         onChange={onChange}
         placeholder={placeholder}
         autoComplete={type === "password" ? "current-password" : "email"}
-        className={cn("field-input-dark", error && "border-prime-red")}
+        className={cn("field-input-dark rounded-2xl", error && "border-prime-red")}
       />
       {error && <FieldError>{error}</FieldError>}
     </div>
   );
 }
 
-function LoginPage({ navigate, onLogin }) {
+function LoginPage({ navigate, onLogin, lang, setLang, t }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
@@ -1824,9 +2225,9 @@ function LoginPage({ navigate, onLogin }) {
 
   const validate = () => {
     const next = {};
-    if (!email.trim()) next.email = "Email wajib diisi.";
-    else if (!validateEmail(email)) next.email = "Gunakan format email yang valid.";
-    if (!password) next.password = "Password wajib diisi.";
+    if (!email.trim()) next.email = t.emailRequired;
+    else if (!validateEmail(email)) next.email = t.invalidEmail;
+    if (!password) next.password = t.passwordRequired;
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -1834,16 +2235,16 @@ function LoginPage({ navigate, onLogin }) {
   const recordFailure = () => {
     const now = Date.now();
     const state = getLoginState(email.trim());
-    const recent = (state.failedAt || []).filter((t) => now - t <= LOGIN_WINDOW_MS);
+    const recent = (state.failedAt || []).filter((time) => now - time <= LOGIN_WINDOW_MS);
     const nextFailed = [...recent, now];
     const next = { failedAt: nextFailed, lockUntil: state.lockUntil || 0 };
 
     if (nextFailed.length >= MAX_LOGIN_ATTEMPTS) {
       next.lockUntil = now + LOGIN_LOCK_MS;
       setLockUntil(next.lockUntil);
-      setMessage("Akun dikunci sementara selama 15 menit karena 5x gagal login dalam 30 menit.");
+      setMessage(t.lockMessage);
     } else {
-      setMessage(`Email atau password tidak valid. Percobaan ${nextFailed.length} dari ${MAX_LOGIN_ATTEMPTS}.`);
+      setMessage(`${t.invalidLogin} ${nextFailed.length}/${MAX_LOGIN_ATTEMPTS}.`);
     }
 
     setLoginState(email.trim(), next);
@@ -1879,7 +2280,7 @@ function LoginPage({ navigate, onLogin }) {
     const state = getLoginState(email.trim());
     if ((state.lockUntil || 0) > Date.now()) {
       setLockUntil(state.lockUntil);
-      setMessage(`Akun masih terkunci. Coba lagi sekitar ${lockedMinutes || 15} menit lagi.`);
+      setMessage(`${t.locked} ${lockedMinutes || 15} minutes.`);
       return;
     }
 
@@ -1903,8 +2304,7 @@ function LoginPage({ navigate, onLogin }) {
 
   return (
     <main className="relative grid min-h-screen place-items-center overflow-hidden bg-prime-black p-6">
-      <div className="absolute right-[12%] top-[12%] h-80 w-80 animate-float-slow rounded-full bg-prime-gold/5 blur-3xl" />
-      <div className="absolute bottom-[15%] left-[8%] h-56 w-56 rounded-full bg-prime-gold/5 blur-3xl" />
+      <ReactiveBackground />
 
       <button
         type="button"
@@ -1912,42 +2312,44 @@ function LoginPage({ navigate, onLogin }) {
         className="absolute left-6 top-6 inline-flex items-center gap-2 rounded-2xl px-2 py-2 text-xs font-semibold text-white/55 transition duration-300 hover:bg-white/5 hover:text-white"
       >
         <span className="text-prime-gold">←</span>
-        Kembali ke Beranda
+        {t.backHome}
       </button>
+
+      <div className="absolute right-6 top-6">
+        <LangToggle lang={lang} setLang={setLang} />
+      </div>
 
       <div className="relative w-full max-w-[430px] animate-fade-up">
         <div className="mb-10 flex justify-center">
-          <Wordmark light onClick={() => navigate("landing")} />
+          <Wordmark light onClick={() => navigate("landing")} t={t} />
         </div>
 
         <form onSubmit={submit} className="rounded-[2rem] border border-prime-gold/15 bg-white/[0.026] p-7 shadow-soft backdrop-blur-xl sm:p-10">
-          <SectionEyebrow light>Portal Internal</SectionEyebrow>
+          <SectionEyebrow light>{t.loginEyebrow}</SectionEyebrow>
 
           <div className="mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-prime-gold/10 text-prime-gold shadow-gold">
             <UserArrowIcon />
           </div>
 
-          <h1 className="text-2xl font-black tracking-[-0.04em] text-white">Masuk ke Dashboard</h1>
-          <p className="mt-2 text-sm leading-6 text-white/25">
-            Akses internal untuk admin dan superadmin Prime Property. Tidak ada self-registration.
-          </p>
+          <h1 className="text-2xl font-black tracking-[-0.04em] text-white">{t.loginTitle}</h1>
+          <p className="mt-2 text-sm leading-6 text-white/25">{t.loginDesc}</p>
 
           <div className="my-7 h-px bg-prime-gold/15" />
 
           <InputFieldDark
-            label="Email"
+            label={t.email}
             type="email"
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
               setErrors((er) => ({ ...er, email: "" }));
             }}
-            placeholder="agent@primeproperty.id"
+            placeholder="superadmin@primeproperty.id"
             error={errors.email}
           />
 
           <InputFieldDark
-            label="Password"
+            label={t.password}
             type="password"
             value={password}
             onChange={(e) => {
@@ -1959,32 +2361,25 @@ function LoginPage({ navigate, onLogin }) {
           />
 
           {message && (
-            <div
-              className={cn(
-                "mb-5 rounded-2xl border p-3 text-xs leading-6",
-                message.includes("berhasil")
-                  ? "border-prime-gold/30 bg-prime-gold/10 text-prime-gold"
-                  : "border-prime-red/35 bg-prime-red/10 text-prime-red"
-              )}
-            >
+            <div className="mb-5 rounded-2xl border border-prime-red/35 bg-prime-red/10 p-3 text-xs leading-6 text-prime-red">
               {message}
             </div>
           )}
 
           <PrimaryCTA type="submit" disabled={locked || loading} icon={<UserArrowIcon />}>
-            {loading ? "Memverifikasi..." : locked ? `Terkunci ${lockedMinutes} menit` : "Masuk"}
+            {loading ? t.verifying : locked ? `${t.locked} ${lockedMinutes} min` : t.signIn}
           </PrimaryCTA>
 
           <p className="mt-5 text-center text-[10px] leading-5 text-white/25">
-            Superadmin: superadmin@primeproperty.id / Prime12345!
+            {t.superadminDemo}
             <br />
-            Admin: agent@primeproperty.id / Prime12345!
+            {t.adminDemo}
           </p>
         </form>
 
         <p className="mt-5 flex items-center justify-center gap-2 text-[8px] font-bold uppercase tracking-[0.18em] text-white/20">
           <span className="h-1 w-1 rotate-45 bg-prime-gold/40" />
-          Koneksi Aman · Session via httpOnly Cookie
+          {t.secureSession}
           <span className="h-1 w-1 rotate-45 bg-prime-gold/40" />
         </p>
       </div>
@@ -1992,14 +2387,14 @@ function LoginPage({ navigate, onLogin }) {
   );
 }
 
-function LandingPage({ navigate, currentPage }) {
+function LandingPage({ navigate, currentPage, lang, setLang, t }) {
   return (
     <>
-      <Header currentPage={currentPage} navigate={navigate} />
-      <Hero navigate={navigate} />
-      <FeaturedSection />
-      <WhySection />
-      <Footer navigate={navigate} />
+      <Header currentPage={currentPage} navigate={navigate} lang={lang} setLang={setLang} t={t} />
+      <Hero navigate={navigate} t={t} />
+      <FeaturedSection t={t} />
+      <WhySection t={t} />
+      <Footer navigate={navigate} t={t} />
     </>
   );
 }
@@ -2007,6 +2402,12 @@ function LandingPage({ navigate, currentPage }) {
 export default function App() {
   const { page, navigate } = useClientRouter();
   const [auth, setAuth] = useState(loadAuthSession);
+  const [lang, setLang] = useState(() => safeGetJSON(LANG_KEY, DEFAULT_LANG));
+  const t = useMemo(() => ({ ...COPY[lang], lang }), [lang]);
+
+  useEffect(() => {
+    document.documentElement.lang = lang === "en" ? "en" : "id";
+  }, [lang]);
 
   const handleLogin = (account) => {
     const session = saveAuthSession(account);
@@ -2022,14 +2423,14 @@ export default function App() {
 
   const renderedPage = useMemo(() => {
     if (page === "dashboard") {
-      if (!auth) return <LoginPage navigate={navigate} onLogin={handleLogin} />;
-      return <DashboardPage auth={auth} onLogout={handleLogout} navigate={navigate} />;
+      if (!auth) return <LoginPage navigate={navigate} onLogin={handleLogin} lang={lang} setLang={setLang} t={t} />;
+      return <DashboardPage auth={auth} onLogout={handleLogout} navigate={navigate} lang={lang} setLang={setLang} t={t} />;
     }
-    if (page === "login") return <LoginPage navigate={navigate} onLogin={handleLogin} />;
-    if (page === "about") return <AboutPage currentPage={page} navigate={navigate} />;
-    if (page === "contact") return <ContactPage currentPage={page} navigate={navigate} />;
-    return <LandingPage currentPage={page} navigate={navigate} />;
-  }, [page, navigate, auth]);
+    if (page === "login") return <LoginPage navigate={navigate} onLogin={handleLogin} lang={lang} setLang={setLang} t={t} />;
+    if (page === "about") return <AboutPage currentPage={page} navigate={navigate} lang={lang} setLang={setLang} t={t} />;
+    if (page === "contact") return <ContactPage currentPage={page} navigate={navigate} lang={lang} setLang={setLang} t={t} />;
+    return <LandingPage currentPage={page} navigate={navigate} lang={lang} setLang={setLang} t={t} />;
+  }, [page, navigate, auth, lang, t]);
 
   return renderedPage;
 }

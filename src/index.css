@@ -22,7 +22,8 @@
 
   button,
   input,
-  textarea {
+  textarea,
+  select {
     font: inherit;
   }
 
@@ -50,5 +51,9 @@
 
   .field-input-dark {
     @apply w-full border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none transition duration-200 placeholder:text-white/20 focus:border-prime-gold;
+  }
+
+  .glass-panel {
+    @apply border border-white/10 bg-white/[0.04] backdrop-blur-xl;
   }
 }
