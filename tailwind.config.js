@@ -28,9 +28,17 @@ export default {
           "0%": { opacity: "0", transform: "translateY(18px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        fadeOut: {
+          "0%": { opacity: "1" },
+          "100%": { opacity: "0" },
+        },
         slideInRight: {
           "0%": { opacity: "0", transform: "translateX(42px)" },
           "100%": { opacity: "1", transform: "translateX(0)" },
+        },
+        slideOutRight: {
+          "0%": { opacity: "1", transform: "translateX(0)" },
+          "100%": { opacity: "0", transform: "translateX(42px)" },
         },
         softPulse: {
           "0%, 100%": { transform: "scale(1)", opacity: "1" },
@@ -43,8 +51,10 @@ export default {
       },
       animation: {
         "fade-in": "fadeIn .35s ease-out both",
+        "fade-out": "fadeOut .5s ease-out both",
         "fade-up": "fadeUp .55s ease-out both",
         "slide-in-right": "slideInRight .5s cubic-bezier(.22,1,.36,1) both",
+        "slide-out-right": "slideOutRight .5s cubic-bezier(.22,1,.36,1) both",
         "soft-pulse": "softPulse 2.8s ease-in-out infinite",
         "float-slow": "floatSlow 5s ease-in-out infinite",
       },

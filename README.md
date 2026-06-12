@@ -22,8 +22,15 @@ http://localhost:5173
 
 ## Demo login
 
+Superadmin:
+- Email: `superadmin@primeproperty.id`
+- Password: `Prime12345!`
+
+Admin readonly:
 - Email: `agent@primeproperty.id`
 - Password: `Prime12345!`
+
+Setelah login berhasil, user diarahkan ke `/agent/dashboard`. Pada mode superadmin tersedia fitur simulasi backend: tambah, edit, detail, dan soft delete properti menggunakan localStorage.
 
 ## Catatan production
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-const SHOW_AGENT_LOGIN_IN_PUBLIC_NAV = true;
+const SHOW_AGENT_LOGIN_IN_PUBLIC_NAV = false;
 
 const CONTACT_INFO = {
   phone: "+62 812-3456-7890",
@@ -172,6 +172,67 @@ function safeSetJSON(key, value) {
   }
 }
 
+function safeRemove(key) {
+  try {
+    if (typeof window === "undefined" || !window.localStorage) return;
+    window.localStorage.removeItem(key);
+  } catch {
+    // noop
+  }
+}
+
+const AUTH_KEY = "prime_property_auth_session_v1";
+const PROPERTY_STORE_KEY = "prime_property_mock_backend_v1";
+
+function loadAuthSession() {
+  const session = safeGetJSON(AUTH_KEY, null);
+  if (!session || !session.expiresAt || session.expiresAt < Date.now()) {
+    safeRemove(AUTH_KEY);
+    return null;
+  }
+  return session;
+}
+
+function saveAuthSession(account) {
+  const session = {
+    ...account,
+    expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+  };
+  safeSetJSON(AUTH_KEY, session);
+  return session;
+}
+
+function formatNowWib() {
+  return new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Jakarta",
+  }).format(new Date());
+}
+
+function seedManagedProperties() {
+  return PROPERTIES.map((p, i) => ({
+    ...p,
+    unit: i % 2 === 0 ? "Ready Siap Huni" : "Gate Siap",
+    created_at: "24 Mei 2026",
+    updated_at: "24 Mei 2026",
+    created_by: "Superadmin",
+    deleted_at: null,
+  }));
+}
+
+function loadManagedProperties() {
+  const stored = safeGetJSON(PROPERTY_STORE_KEY, null);
+  if (Array.isArray(stored) && stored.length) return stored;
+  const seeded = seedManagedProperties();
+  safeSetJSON(PROPERTY_STORE_KEY, seeded);
+  return seeded;
+}
+
+function persistManagedProperties(items) {
+  safeSetJSON(PROPERTY_STORE_KEY, items);
+}
+
 function safeOpenExternal(url) {
   try {
     const w = window.open(url, "_blank", "noopener,noreferrer");
@@ -182,6 +243,7 @@ function safeOpenExternal(url) {
 }
 
 function pageFromPath(pathname) {
+  if (pathname.startsWith("/agent/dashboard")) return "dashboard";
   if (pathname.startsWith("/agent/login")) return "login";
   if (pathname.startsWith("/about")) return "about";
   if (pathname.startsWith("/contact")) return "contact";
@@ -193,6 +255,7 @@ const routes = {
   about: "/about",
   contact: "/contact",
   login: "/agent/login",
+  dashboard: "/agent/dashboard",
 };
 
 function readInitialPage() {
@@ -687,43 +750,82 @@ function DetailRow({ label, value }) {
   );
 }
 
-function PropertyDetailDrawer({ property, onClose }) {
+function PropertyDetailDrawer({
+  property,
+  onClose,
+  canManage = false,
+  onEdit,
+  onDelete,
+  context = "public",
+}) {
+  const [renderedProperty, setRenderedProperty] = useState(property);
+  const [closing, setClosing] = useState(false);
+
   useEffect(() => {
-    if (!property) return undefined;
+    if (property) {
+      setRenderedProperty(property);
+      setClosing(false);
+      document.body.style.overflow = "hidden";
+      return undefined;
+    }
+
+    if (renderedProperty) {
+      setClosing(true);
+      const timer = setTimeout(() => {
+        setRenderedProperty(null);
+        setClosing(false);
+        document.body.style.overflow = "";
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+
+    document.body.style.overflow = "";
+    return undefined;
+  }, [property, renderedProperty]);
+
+  useEffect(() => {
+    if (!renderedProperty) return undefined;
     const onKey = (e) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
 
     return () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, [property, onClose]);
+  }, [renderedProperty, onClose]);
 
-  if (!property) return null;
+  if (!renderedProperty) return null;
 
   const siapLabel = {
     siap_huni: "Siap Huni",
     siap_kosong: "Siap Kosong",
     siap_huni_renovasi: "Siap Huni Renovasi",
-  }[property.siap] || "Siap Huni";
+  }[renderedProperty.siap] || "Siap Huni";
 
   return (
     <>
       <div
-        className="fixed inset-0 z-[70] animate-fade-in bg-prime-black/55 backdrop-blur-sm"
+        className={cn(
+          "fixed inset-0 z-[70] bg-prime-black/55 backdrop-blur-sm",
+          closing ? "animate-fade-out" : "animate-fade-in"
+        )}
         onClick={onClose}
       />
 
       <aside
         role="dialog"
         aria-modal="true"
-        className="fixed bottom-0 right-0 top-0 z-[71] w-full max-w-[500px] animate-slide-in-right overflow-y-auto bg-white shadow-soft"
+        className={cn(
+          "fixed bottom-0 right-0 top-0 z-[71] w-full max-w-[520px] overflow-y-auto bg-white shadow-soft",
+          closing ? "animate-slide-out-right" : "animate-slide-in-right"
+        )}
       >
         <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-prime-black/10 bg-white/95 p-5 backdrop-blur-xl">
           <div>
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-prime-gold">Detail Properti</p>
-            <h2 className="mt-1 text-xl font-black tracking-[-0.03em] text-prime-black">{property.name}</h2>
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-prime-gold">
+              {context === "dashboard" ? "Dashboard Properti" : "Detail Properti"}
+            </p>
+            <h2 className="mt-1 text-xl font-black tracking-[-0.03em] text-prime-black">{renderedProperty.name}</h2>
           </div>
 
           <button
@@ -737,11 +839,11 @@ function PropertyDetailDrawer({ property, onClose }) {
         </div>
 
         <div className="relative">
-          <img src={property.image} alt={`Foto ${property.name}`} className="h-64 w-full object-cover" />
+          <img src={renderedProperty.image} alt={`Foto ${renderedProperty.name}`} className="h-64 w-full object-cover" />
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-prime-black/55 to-transparent p-5">
             <div className="flex flex-wrap gap-2">
-              <TypeBadge type={property.tipe} />
-              <StatusTag status={property.status} siap={property.siap} />
+              <TypeBadge type={renderedProperty.tipe} />
+              <StatusTag status={renderedProperty.status} siap={renderedProperty.siap} />
             </div>
           </div>
         </div>
@@ -749,42 +851,63 @@ function PropertyDetailDrawer({ property, onClose }) {
         <div className="space-y-6 p-5">
           <section className="animate-fade-up rounded-3xl bg-prime-soft p-5">
             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-prime-black/40">Harga</p>
-            <p className="mt-1 text-3xl font-black tracking-[-0.05em] text-prime-black">{fmtRp(property.price)}</p>
+            <p className="mt-1 text-3xl font-black tracking-[-0.05em] text-prime-black">{fmtRp(renderedProperty.price)}</p>
             <p className="mt-2 text-sm leading-6 text-prime-black/55">
-              {property.group ? `${property.group} · ` : ""}{property.kawasan}
+              {renderedProperty.group ? `${renderedProperty.group} · ` : ""}{renderedProperty.kawasan}
             </p>
           </section>
 
+          {canManage && (
+            <section className="animate-fade-up flex flex-wrap gap-3 rounded-3xl border border-prime-gold/20 bg-prime-gold/5 p-4">
+              <button
+                type="button"
+                onClick={() => onEdit?.(renderedProperty)}
+                className="inline-flex items-center justify-center rounded-2xl bg-prime-black px-5 py-3 text-[10px] font-black uppercase tracking-[0.16em] text-prime-gold transition duration-300 hover:-translate-y-0.5"
+              >
+                Edit Properti
+              </button>
+              <button
+                type="button"
+                onClick={() => onDelete?.(renderedProperty)}
+                className="inline-flex items-center justify-center rounded-2xl bg-prime-red/10 px-5 py-3 text-[10px] font-black uppercase tracking-[0.16em] text-prime-red transition duration-300 hover:-translate-y-0.5 hover:bg-prime-red/15"
+              >
+                Hapus / Arsipkan
+              </button>
+            </section>
+          )}
+
           <section className="animate-fade-up grid gap-x-5 md:grid-cols-2">
             <div>
-              <DetailRow label="Nama Properti" value={property.name} />
-              <DetailRow label="Group" value={property.group || "-"} />
-              <DetailRow label="Ukuran" value={`${property.lebar} × ${property.panjang} meter`} />
-              <DetailRow label="Hadap" value={property.hadap} />
-              <DetailRow label="Tipe" value={property.tipe} />
+              <DetailRow label="Nama Properti" value={renderedProperty.name} />
+              <DetailRow label="Group" value={renderedProperty.group || "-"} />
+              <DetailRow label="Ukuran" value={`${renderedProperty.lebar} × ${renderedProperty.panjang} meter`} />
+              <DetailRow label="Hadap" value={renderedProperty.hadap} />
+              <DetailRow label="Tipe" value={renderedProperty.tipe} />
+              <DetailRow label="Unit" value={renderedProperty.unit || "-"} />
             </div>
             <div>
-              <DetailRow label="Tingkat" value={`${property.tingkat} lantai`} />
-              <DetailRow label="Carport" value={property.carport ? "Ya" : "Tidak"} />
-              <DetailRow label="Status" value={property.status === "sold_out" ? "Sold Out" : "In Stock"} />
+              <DetailRow label="Tingkat" value={`${renderedProperty.tingkat} lantai`} />
+              <DetailRow label="Carport" value={renderedProperty.carport ? "Ya" : "Tidak"} />
+              <DetailRow label="Status" value={renderedProperty.status === "sold_out" ? "Sold Out" : "In Stock"} />
               <DetailRow label="Kondisi" value={siapLabel} />
-              <DetailRow label="Kawasan" value={property.kawasan} />
+              <DetailRow label="Kawasan" value={renderedProperty.kawasan} />
+              <DetailRow label="Update Terakhir" value={renderedProperty.updated_at || "-"} />
             </div>
           </section>
 
           <section className="animate-fade-up rounded-3xl border border-prime-gold/20 bg-prime-gold/5 p-5">
             <h3 className="text-sm font-black text-prime-black">Ringkasan</h3>
             <p className="mt-2 text-sm leading-7 text-prime-black/60">
-              {property.name} adalah {property.tipe.toLowerCase()} di kawasan {property.kawasan} dengan
-              ukuran {property.lebar} × {property.panjang} meter, hadap {property.hadap}, terdiri dari{" "}
-              {property.tingkat} lantai, dan {property.carport ? "sudah memiliki" : "belum memiliki"} carport.
+              {renderedProperty.name} adalah {renderedProperty.tipe.toLowerCase()} di kawasan {renderedProperty.kawasan} dengan
+              ukuran {renderedProperty.lebar} × {renderedProperty.panjang} meter, hadap {renderedProperty.hadap}, terdiri dari{" "}
+              {renderedProperty.tingkat} lantai, dan {renderedProperty.carport ? "sudah memiliki" : "belum memiliki"} carport.
             </p>
           </section>
 
-          {property.maps_link && (
+          {renderedProperty.maps_link && (
             <button
               type="button"
-              onClick={() => safeOpenExternal(property.maps_link)}
+              onClick={() => safeOpenExternal(renderedProperty.maps_link)}
               className="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-prime-black px-5 py-4 text-xs font-black uppercase tracking-[0.16em] text-prime-gold transition duration-300 hover:-translate-y-0.5 hover:bg-black"
             >
               <PinIcon />
@@ -1173,6 +1296,471 @@ function Footer({ navigate }) {
   );
 }
 
+
+function DashboardStat({ label, value, tone = "gold" }) {
+  return (
+    <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
+      <p className="text-[9px] font-black uppercase tracking-[0.18em] text-white/35">{label}</p>
+      <p className={cn("mt-3 text-3xl font-black tracking-[-0.05em]", tone === "red" ? "text-prime-red" : "text-prime-gold")}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function DashboardHeader({ auth, onLogout, navigate }) {
+  return (
+    <header className="sticky top-0 z-50 border-b border-prime-gold/15 bg-prime-black/95 px-6 py-4 backdrop-blur-xl sm:px-8">
+      <div className="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-4">
+        <Wordmark light onClick={() => navigate("dashboard")} />
+        <div className="flex items-center gap-3">
+          <div className="hidden text-right sm:block">
+            <p className="text-xs font-black text-white">{auth.name}</p>
+            <p className="text-[9px] font-black uppercase tracking-[0.16em] text-prime-gold">{auth.role}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate("landing")}
+            className="rounded-2xl px-4 py-3 text-[10px] font-black uppercase tracking-[0.16em] text-white/45 transition hover:bg-white/5 hover:text-white"
+          >
+            Lihat Website
+          </button>
+          <button
+            type="button"
+            onClick={onLogout}
+            className="rounded-2xl bg-prime-red/10 px-4 py-3 text-[10px] font-black uppercase tracking-[0.16em] text-prime-red transition hover:bg-prime-red/15"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function emptyPropertyForm() {
+  return {
+    name: "",
+    group: "",
+    lebar: "",
+    panjang: "",
+    hadap: "Timur",
+    tipe: "Ruko",
+    tingkat: "1",
+    price: "",
+    carport: true,
+    status: "in_stock",
+    siap: "siap_huni",
+    kawasan: "",
+    unit: "",
+    maps_link: "",
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85",
+  };
+}
+
+function propertyToForm(p) {
+  return {
+    ...emptyPropertyForm(),
+    ...p,
+    group: p.group || "",
+    lebar: String(p.lebar ?? ""),
+    panjang: String(p.panjang ?? ""),
+    tingkat: String(p.tingkat ?? ""),
+    price: String(p.price ?? ""),
+    unit: p.unit || "",
+    maps_link: p.maps_link || "",
+    image: p.image || emptyPropertyForm().image,
+  };
+}
+
+function validatePropertyForm(form) {
+  const errors = {};
+  if (!form.name.trim()) errors.name = "Nama properti wajib diisi.";
+  else if (form.name.trim().length < 3) errors.name = "Nama minimal 3 karakter.";
+  else if (form.name.trim().length > 100) errors.name = "Nama maksimal 100 karakter.";
+
+  const lebar = Number(form.lebar);
+  const panjang = Number(form.panjang);
+  const tingkat = Number(form.tingkat);
+  const price = Number(String(form.price).replace(/\D/g, ""));
+
+  if (!lebar || lebar <= 0) errors.lebar = "Lebar harus lebih dari 0.";
+  if (!panjang || panjang <= 0) errors.panjang = "Panjang harus lebih dari 0.";
+  if (!tingkat || tingkat < 1 || tingkat > 10) errors.tingkat = "Tingkat harus 1 sampai 10.";
+  if (!price || price <= 0) errors.price = "Harga wajib diisi dan harus lebih dari 0.";
+  if (!form.kawasan.trim()) errors.kawasan = "Kawasan wajib diisi.";
+  if (form.maps_link && !form.maps_link.includes("google.com/maps") && !form.maps_link.includes("google.com/search")) {
+    errors.maps_link = "Link maps harus mengandung domain google.com/maps atau Google Maps search.";
+  }
+
+  return errors;
+}
+
+function DashInput({ label, error, children }) {
+  return (
+    <label className="block">
+      <span className="field-label">{label}</span>
+      {children}
+      {error && <FieldError>{error}</FieldError>}
+    </label>
+  );
+}
+
+function PropertyEditorDrawer({ open, property, onClose, onSubmit }) {
+  const [renderOpen, setRenderOpen] = useState(open);
+  const [closing, setClosing] = useState(false);
+  const [form, setForm] = useState(emptyPropertyForm());
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (open) {
+      setRenderOpen(true);
+      setClosing(false);
+      setForm(property ? propertyToForm(property) : emptyPropertyForm());
+      setErrors({});
+      document.body.style.overflow = "hidden";
+    } else if (renderOpen) {
+      setClosing(true);
+      const timer = setTimeout(() => {
+        setRenderOpen(false);
+        setClosing(false);
+        document.body.style.overflow = "";
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [open, property, renderOpen]);
+
+  useEffect(() => {
+    if (!renderOpen) return undefined;
+    const onKey = (e) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [renderOpen, onClose]);
+
+  if (!renderOpen) return null;
+
+  const set = (field) => (e) => {
+    const value = e?.target?.type === "checkbox" ? e.target.checked : e.target.value;
+    setForm((f) => ({ ...f, [field]: value }));
+    setErrors((er) => ({ ...er, [field]: "" }));
+  };
+
+  const submit = (e) => {
+    e.preventDefault();
+    const nextErrors = validatePropertyForm(form);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
+
+    onSubmit({
+      ...form,
+      id: property?.id || Date.now(),
+      name: form.name.trim(),
+      group: form.group.trim() || null,
+      lebar: Number(form.lebar),
+      panjang: Number(form.panjang),
+      tingkat: Number(form.tingkat),
+      price: Number(String(form.price).replace(/\D/g, "")),
+      kawasan: form.kawasan.trim(),
+      unit: form.unit.trim() || null,
+      maps_link: form.maps_link.trim() || "",
+      image: form.image.trim() || emptyPropertyForm().image,
+      created_at: property?.created_at || formatNowWib(),
+      updated_at: formatNowWib(),
+      created_by: property?.created_by || "Superadmin",
+      deleted_at: null,
+    });
+  };
+
+  const inputClass = "field-input rounded-2xl";
+
+  return (
+    <>
+      <div
+        className={cn("fixed inset-0 z-[80] bg-prime-black/55 backdrop-blur-sm", closing ? "animate-fade-out" : "animate-fade-in")}
+        onClick={onClose}
+      />
+
+      <aside className={cn("fixed bottom-0 right-0 top-0 z-[81] w-full max-w-[640px] overflow-y-auto bg-white shadow-soft", closing ? "animate-slide-out-right" : "animate-slide-in-right")}>
+        <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-prime-black/10 bg-white/95 p-5 backdrop-blur-xl">
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-prime-gold">Superadmin Form</p>
+            <h2 className="mt-1 text-xl font-black tracking-[-0.03em] text-prime-black">
+              {property ? "Edit Properti" : "Tambah Properti"}
+            </h2>
+          </div>
+          <button type="button" onClick={onClose} className="grid h-10 w-10 place-items-center rounded-2xl bg-prime-soft text-prime-black transition hover:rotate-90 hover:text-prime-red">
+            <XIcon />
+          </button>
+        </div>
+
+        <form onSubmit={submit} className="grid gap-5 p-5 sm:grid-cols-2">
+          <DashInput label="Nama Properti" error={errors.name}>
+            <input className={cn(inputClass, errors.name && "border-prime-red")} value={form.name} onChange={set("name")} />
+          </DashInput>
+
+          <DashInput label="Group" error={errors.group}>
+            <input className={inputClass} value={form.group} onChange={set("group")} placeholder="Opsional" />
+          </DashInput>
+
+          <DashInput label="Lebar (m)" error={errors.lebar}>
+            <input className={cn(inputClass, errors.lebar && "border-prime-red")} value={form.lebar} onChange={set("lebar")} inputMode="decimal" />
+          </DashInput>
+
+          <DashInput label="Panjang (m)" error={errors.panjang}>
+            <input className={cn(inputClass, errors.panjang && "border-prime-red")} value={form.panjang} onChange={set("panjang")} inputMode="decimal" />
+          </DashInput>
+
+          <DashInput label="Hadap" error={errors.hadap}>
+            <select className={inputClass} value={form.hadap} onChange={set("hadap")}>
+              {["Utara", "Selatan", "Timur", "Barat"].map((v) => <option key={v}>{v}</option>)}
+            </select>
+          </DashInput>
+
+          <DashInput label="Tipe" error={errors.tipe}>
+            <select className={inputClass} value={form.tipe} onChange={set("tipe")}>
+              <option>Ruko</option>
+              <option>Villa</option>
+            </select>
+          </DashInput>
+
+          <DashInput label="Tingkat" error={errors.tingkat}>
+            <input className={cn(inputClass, errors.tingkat && "border-prime-red")} value={form.tingkat} onChange={set("tingkat")} inputMode="decimal" />
+          </DashInput>
+
+          <DashInput label="Harga" error={errors.price}>
+            <input className={cn(inputClass, errors.price && "border-prime-red")} value={form.price} onChange={set("price")} inputMode="numeric" />
+          </DashInput>
+
+          <DashInput label="Status" error={errors.status}>
+            <select className={inputClass} value={form.status} onChange={set("status")}>
+              <option value="in_stock">In Stock</option>
+              <option value="sold_out">Sold Out</option>
+            </select>
+          </DashInput>
+
+          <DashInput label="Kondisi" error={errors.siap}>
+            <select className={inputClass} value={form.siap} onChange={set("siap")}>
+              <option value="siap_huni">Siap Huni</option>
+              <option value="siap_kosong">Siap Kosong</option>
+              <option value="siap_huni_renovasi">Siap Huni Renovasi</option>
+            </select>
+          </DashInput>
+
+          <DashInput label="Kawasan" error={errors.kawasan}>
+            <input className={cn(inputClass, errors.kawasan && "border-prime-red")} value={form.kawasan} onChange={set("kawasan")} />
+          </DashInput>
+
+          <DashInput label="Unit" error={errors.unit}>
+            <input className={inputClass} value={form.unit} onChange={set("unit")} placeholder="Ready Siap Huni" />
+          </DashInput>
+
+          <label className="flex items-center gap-3 rounded-2xl bg-prime-soft p-4 text-sm font-bold text-prime-black">
+            <input type="checkbox" checked={form.carport} onChange={set("carport")} />
+            Ada carport
+          </label>
+
+          <DashInput label="Image URL" error={errors.image}>
+            <input className={inputClass} value={form.image} onChange={set("image")} />
+          </DashInput>
+
+          <DashInput label="Google Maps Link" error={errors.maps_link}>
+            <input className={cn(inputClass, errors.maps_link && "border-prime-red")} value={form.maps_link} onChange={set("maps_link")} placeholder="https://www.google.com/maps/..." />
+          </DashInput>
+
+          <div className="sm:col-span-2 flex flex-wrap gap-3 border-t border-prime-black/10 pt-5">
+            <PrimaryCTA type="submit" icon={<ArrowRightIcon />}>
+              {property ? "Simpan Perubahan" : "Tambah Properti"}
+            </PrimaryCTA>
+            <button type="button" onClick={onClose} className="rounded-2xl bg-prime-soft px-5 py-4 text-[11px] font-black uppercase tracking-[0.16em] text-prime-black/55 transition hover:bg-prime-black/10">
+              Batal
+            </button>
+          </div>
+        </form>
+      </aside>
+    </>
+  );
+}
+
+function DashboardPage({ auth, onLogout, navigate }) {
+  const [properties, setProperties] = useState(loadManagedProperties);
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState(null);
+  const [editing, setEditing] = useState(null);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const isSuperadmin = auth.role === "superadmin";
+
+  useEffect(() => {
+    persistManagedProperties(properties);
+  }, [properties]);
+
+  const activeProperties = properties.filter((p) => !p.deleted_at);
+  const archived = properties.filter((p) => p.deleted_at);
+  const filtered = activeProperties.filter((p) => {
+    const q = query.toLowerCase().trim();
+    if (!q) return true;
+    return [p.name, p.group, p.kawasan, p.tipe, p.status, p.siap].filter(Boolean).join(" ").toLowerCase().includes(q);
+  });
+
+  const openCreate = () => {
+    setEditing(null);
+    setEditorOpen(true);
+  };
+
+  const openEdit = (property) => {
+    setSelected(null);
+    setEditing(property);
+    setEditorOpen(true);
+  };
+
+  const saveProperty = (payload) => {
+    setProperties((items) => {
+      const exists = items.some((x) => x.id === payload.id);
+      if (exists) return items.map((x) => (x.id === payload.id ? payload : x));
+      return [payload, ...items];
+    });
+    setEditorOpen(false);
+    setEditing(null);
+    setToast(payload.created_at === payload.updated_at ? "Properti berhasil ditambahkan." : "Perubahan properti berhasil disimpan.");
+  };
+
+  const deleteProperty = (property) => {
+    const ok = window.confirm(`Yakin hapus properti ${property.name}? Tindakan ini tidak dapat dibatalkan.`);
+    if (!ok) return;
+    setSelected(null);
+    setProperties((items) => items.map((x) => (x.id === property.id ? { ...x, deleted_at: formatNowWib(), updated_at: formatNowWib() } : x)));
+    setToast("Properti dipindahkan ke arsip / soft delete.");
+  };
+
+  return (
+    <div className="min-h-screen bg-prime-black">
+      <DashboardHeader auth={auth} onLogout={onLogout} navigate={navigate} />
+
+      <main className="mx-auto max-w-[1320px] px-6 py-8 sm:px-8">
+        <section className="animate-fade-up">
+          <div className="flex flex-wrap items-end justify-between gap-5">
+            <div>
+              <SectionEyebrow light>Internal Agent Portal</SectionEyebrow>
+              <h1 className="text-4xl font-black tracking-[-0.05em] text-white sm:text-5xl">
+                Dashboard {isSuperadmin ? "Superadmin" : "Admin"}
+              </h1>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/40">
+                Ini adalah simulasi backend di frontend menggunakan localStorage. Di production, seluruh CRUD,
+                authorization, audit log, dan session wajib dipindahkan ke backend API.
+              </p>
+            </div>
+
+            {isSuperadmin && (
+              <PrimaryCTA onClick={openCreate} icon={<HomeSearchIcon />}>
+                Tambah Properti
+              </PrimaryCTA>
+            )}
+          </div>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <DashboardStat label="Listing Aktif" value={activeProperties.length} />
+            <DashboardStat label="In Stock" value={activeProperties.filter((p) => p.status === "in_stock").length} />
+            <DashboardStat label="Sold Out" value={activeProperties.filter((p) => p.status === "sold_out").length} tone="red" />
+            <DashboardStat label="Arsip" value={archived.length} />
+          </div>
+        </section>
+
+        <section className="mt-8 animate-fade-up overflow-hidden rounded-[2rem] bg-white shadow-soft">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-prime-black/10 p-5">
+            <div>
+              <h2 className="text-xl font-black tracking-[-0.03em] text-prime-black">Manajemen Listing Properti</h2>
+              <p className="mt-1 text-xs text-prime-black/45">
+                Klik baris untuk detail. {isSuperadmin ? "Superadmin dapat create, update, dan soft delete." : "Admin hanya bisa view dan search."}
+              </p>
+            </div>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Cari nama, group, kawasan..."
+              className="field-input w-full rounded-2xl sm:w-80"
+            />
+          </div>
+
+          <div className="hidden grid-cols-[1.2fr_0.8fr_0.7fr_0.7fr_0.9fr_1fr_0.7fr] gap-4 border-b border-prime-black/5 px-5 py-3 lg:grid">
+            {["Properti", "Ukuran", "Tipe", "Harga", "Status", "Updated", "Aksi"].map((h) => (
+              <div key={h} className="text-[8px] font-black uppercase tracking-[0.2em] text-prime-black/40">{h}</div>
+            ))}
+          </div>
+
+          <div>
+            {filtered.map((p) => (
+              <article
+                key={p.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelected(p)}
+                className="grid cursor-pointer gap-4 border-b border-prime-black/5 p-5 transition duration-300 hover:bg-prime-soft lg:grid-cols-[1.2fr_0.8fr_0.7fr_0.7fr_0.9fr_1fr_0.7fr] lg:items-center"
+              >
+                <div className="flex items-center gap-3">
+                  <img src={p.image} alt={p.name} className="h-14 w-16 rounded-2xl object-cover" />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-black text-prime-black">{p.name}</p>
+                    <p className="text-xs text-prime-black/45">{p.group || "Tanpa group"} · {p.kawasan}</p>
+                  </div>
+                </div>
+                <p className="text-sm font-semibold text-prime-black/55">{p.lebar} × {p.panjang} m</p>
+                <TypeBadge type={p.tipe} />
+                <p className="text-sm font-black text-prime-black">{fmtRp(p.price)}</p>
+                <StatusTag status={p.status} siap={p.siap} />
+                <p className="text-xs text-prime-black/45">{p.updated_at || "-"}</p>
+                <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                  {isSuperadmin ? (
+                    <>
+                      <button type="button" onClick={() => openEdit(p)} className="rounded-xl bg-prime-gold/15 px-3 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-prime-gold">
+                        Edit
+                      </button>
+                      <button type="button" onClick={() => deleteProperty(p)} className="rounded-xl bg-prime-red/10 px-3 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-prime-red">
+                        Hapus
+                      </button>
+                    </>
+                  ) : (
+                    <span className="rounded-xl bg-prime-black/5 px-3 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-prime-black/40">
+                      View
+                    </span>
+                  )}
+                </div>
+              </article>
+            ))}
+
+            {!filtered.length && (
+              <div className="p-10 text-center text-sm text-prime-black/45">Tidak ada properti yang cocok dengan pencarian.</div>
+            )}
+          </div>
+        </section>
+      </main>
+
+      <PropertyDetailDrawer
+        property={selected}
+        onClose={() => setSelected(null)}
+        canManage={isSuperadmin}
+        onEdit={openEdit}
+        onDelete={deleteProperty}
+        context="dashboard"
+      />
+
+      <PropertyEditorDrawer
+        open={editorOpen}
+        property={editing}
+        onClose={() => {
+          setEditorOpen(false);
+          setEditing(null);
+        }}
+        onSubmit={saveProperty}
+      />
+
+      <Toast message={toast} onClose={() => setToast(null)} />
+    </div>
+  );
+}
+
+
 const LOGIN_LOCK_KEY = "prime_agent_login_lock_v1";
 const LOGIN_WINDOW_MS = 30 * 60 * 1000;
 const LOGIN_LOCK_MS = 15 * 60 * 1000;
@@ -1214,7 +1802,7 @@ function InputFieldDark({ label, type = "text", value, onChange, error, placehol
   );
 }
 
-function LoginPage({ navigate }) {
+function LoginPage({ navigate, onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
@@ -1263,7 +1851,23 @@ function LoginPage({ navigate }) {
 
   const mockLoginRequest = async () => {
     await new Promise((resolve) => setTimeout(resolve, 720));
-    return email.trim().toLowerCase() === "agent@primeproperty.id" && password === "Prime12345!";
+
+    const accounts = {
+      "superadmin@primeproperty.id": {
+        email: "superadmin@primeproperty.id",
+        name: "Prime Superadmin",
+        role: "superadmin",
+      },
+      "agent@primeproperty.id": {
+        email: "agent@primeproperty.id",
+        name: "Prime Agent",
+        role: "admin",
+      },
+    };
+
+    const account = accounts[email.trim().toLowerCase()];
+    if (!account || password !== "Prime12345!") return null;
+    return account;
   };
 
   const submit = async (e) => {
@@ -1281,15 +1885,15 @@ function LoginPage({ navigate }) {
 
     setLoading(true);
     try {
-      const ok = await mockLoginRequest();
-      if (!ok) {
+      const account = await mockLoginRequest();
+      if (!account) {
         recordFailure();
         return;
       }
 
       clearLoginState(email.trim());
       setPassword("");
-      setMessage("Login berhasil. Backend production perlu mengirim httpOnly cookie SameSite=Lax berlaku 30 hari.");
+      onLogin?.(account);
     } catch {
       recordFailure();
     } finally {
@@ -1372,9 +1976,9 @@ function LoginPage({ navigate }) {
           </PrimaryCTA>
 
           <p className="mt-5 text-center text-[10px] leading-5 text-white/25">
-            Demo login: agent@primeproperty.id / Prime12345!
+            Superadmin: superadmin@primeproperty.id / Prime12345!
             <br />
-            Akun asli dibuat manual oleh superadmin.
+            Admin: agent@primeproperty.id / Prime12345!
           </p>
         </form>
 
@@ -1402,13 +2006,30 @@ function LandingPage({ navigate, currentPage }) {
 
 export default function App() {
   const { page, navigate } = useClientRouter();
+  const [auth, setAuth] = useState(loadAuthSession);
+
+  const handleLogin = (account) => {
+    const session = saveAuthSession(account);
+    setAuth(session);
+    navigate("dashboard");
+  };
+
+  const handleLogout = () => {
+    safeRemove(AUTH_KEY);
+    setAuth(null);
+    navigate("login");
+  };
 
   const renderedPage = useMemo(() => {
-    if (page === "login") return <LoginPage navigate={navigate} />;
+    if (page === "dashboard") {
+      if (!auth) return <LoginPage navigate={navigate} onLogin={handleLogin} />;
+      return <DashboardPage auth={auth} onLogout={handleLogout} navigate={navigate} />;
+    }
+    if (page === "login") return <LoginPage navigate={navigate} onLogin={handleLogin} />;
     if (page === "about") return <AboutPage currentPage={page} navigate={navigate} />;
     if (page === "contact") return <ContactPage currentPage={page} navigate={navigate} />;
     return <LandingPage currentPage={page} navigate={navigate} />;
-  }, [page, navigate]);
+  }, [page, navigate, auth]);
 
   return renderedPage;
 }
