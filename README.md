@@ -28,3 +28,14 @@ http://localhost:5173
 ## Catatan production
 
 Frontend ini sudah siap untuk integrasi backend, tetapi session `httpOnly cookie`, bcrypt, CSRF, rate limit final, dan authorization role tetap wajib di-handle dari backend.
+
+
+## Deploy Vercel
+
+Pastikan setting Vercel seperti ini:
+
+- Framework Preset: Vite
+- Build Command: `npm run build`
+- Output Directory: `dist`
+
+File `vercel.json` sudah disiapkan untuk SPA fallback agar `/about`, `/contact`, dan `/agent/login` tidak blank/404 saat di-refresh.
